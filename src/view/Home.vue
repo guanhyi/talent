@@ -2,7 +2,7 @@
   <div class="layer">
     <div class="home" v-loading='loading'>
       <div class="home-header MT_50">
-        <el-divider content-position="left">学者合作关系查询</el-divider>
+        <el-divider content-position="left">学者联系路径发现</el-divider>
         <div class="home-header-search PR_20 PL_20">
           <span>人名</span>
           <el-input class="ML_30" v-model="name" placeholder="请输入姓名"></el-input>
@@ -28,8 +28,9 @@
           <div class="info-expert PR_20 MT_20 " v-for="(item, index) in experts.slice(0,9)" :key='index' >
             <img src="static/img/common/exp.png" @click="detail()">
             <div class="expert-text">
-              <span>{{item.Organization}}</span>
               <span>{{item.Name}}</span>
+              <span>&nbsp;&nbsp;</span>
+              <span>{{item.Organization}}</span>
               </div>
             </div>
           </div>
@@ -217,28 +218,53 @@ export default {
             that.$message('无有效合作关系信息！')
           } else {
             let temp = makeGraphData(res)
-
-            if (!temp) {
-              return
-            }
             let template = {
               show: true,
               formatter: '{b0}'
             }
-            console.log(temp)
+            if (!Object.keys(temp).length) {
+              let children = []
+              res.data.forEach((item, index) => {
+                let exp = {
+                  label: template,
+                  value: 'exp',
+                  index: index,
+                  collapsed: false,
+                  id: '#' + item.rid.cluster + ':' + item.rid.position,
+                  name: item.oData.Name
+                }
+                children.push(exp)
+              })
+              that.treeData = {
+                name: that.name,
+                id: '#' + res.data[0].rid.cluster + ':' + res.data[0].rid.position,
+                children: children
+              }
+              return
+            }
 
             temp.children.forEach((item, index) => {
               if (item === undefined) {
                 temp.children.splice(index, 1)
               }
             })
+            temp.value = 'org'
+            temp.label = template
+            temp.collapsed = false
+            temp.index = 0
             temp.children.forEach((item, index) => {
               temp.children[index].label = template
               temp.children[index].value = item.children.length ? 'org' : 'exp'
               temp.children[index].index = index
               temp.children[index].collapsed = false
             })
-            that.treeData = temp
+
+            let tree = {
+              name: that.name,
+              children: []
+            }
+            tree.children[0] = temp
+            that.treeData = tree
             res.data.forEach((item, index) => {
               if (item.oClass === 'Expert') {
                 that.experts.push(item.oData)
@@ -261,6 +287,8 @@ export default {
           temp = res
         }
       })
+      console.log(makeGraphData(temp))
+
       return makeGraphData(temp).id
     },
     detail () {
@@ -286,29 +314,57 @@ export default {
             that.searchShow = false
           } else {
             let temp = makeGraphData(res)
-            console.log(temp)
-            temp.children.forEach((item, index) => {
-              if (item === undefined) {
-                temp.children.splice(index, 1)
-              }
-            })
-            temp.children.forEach((item, index) => {
-              if (item === undefined) {
-                temp.children.splice(index, 1)
-              }
-            })
-
             let template = {
               show: true,
               formatter: '{b0}'
             }
+            if (!Object.keys(temp).length) {
+              let children = []
+              res.data.forEach((item, index) => {
+                let exp = {
+                  label: template,
+                  value: 'exp',
+                  index: index,
+                  collapsed: false,
+                  id: '#' + item.rid.cluster + ':' + item.rid.position,
+                  name: item.oData.Name
+                }
+                children.push(exp)
+              })
+              that.treeData = {
+                name: that.name,
+                id: '#' + res.data[0].rid.cluster + ':' + res.data[0].rid.position,
+                children: children
+              }
+              return
+            }
+            temp.children.forEach((item, index) => {
+              if (item === undefined) {
+                temp.children.splice(index, 1)
+              }
+            })
+            temp.children.forEach((item, index) => {
+              if (item === undefined) {
+                temp.children.splice(index, 1)
+              }
+            })
+            temp.value = 'org'
+            temp.label = template
+            temp.collapsed = false
+            temp.index = 0
             temp.children.forEach((item, index) => {
               temp.children[index].label = template
               temp.children[index].value = item.children.length ? 'org' : 'exp'
               temp.children[index].index = index
               temp.children[index].collapsed = false
             })
-            that.treeData = temp
+
+            let tree = {
+              name: data.s_name,
+              children: []
+            }
+            tree.children[0] = temp
+            that.treeData = tree
             res.data.forEach((item, index) => {
               if (item.oClass === 'Expert') {
                 that.experts.push(item.oData)

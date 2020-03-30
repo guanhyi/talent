@@ -83,7 +83,7 @@ export default {
             top: '1%',
             left: this.left,
             bottom: '1%',
-            right: '10%',
+            right: '20%',
             symbolSize: 7,
             itemStyle: {
               label: {
@@ -113,7 +113,6 @@ export default {
       })
       let that = this
       this.chart.on('click', function (data) {
-        console.log(1)
         if (data.value === 'org') {
           if (!data.data.collapsed) {
             that.treeData.children[data.data.index].collapsed = !data.data.collapsed
