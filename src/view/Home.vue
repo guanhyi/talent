@@ -26,17 +26,18 @@
           <el-divider content-position="left">学者信息</el-divider>
           <div class="info-experts row   PL_20" v-if="typeInfo === 1">
           <div class="info-expert PR_20 MT_20 " v-for="(item, index) in experts.slice(0,9)" :key='index' >
-            <img src="static/img/common/exp.png" @click="detail()">
-            <div class="expert-text">
-              <span>{{item.Name}}</span>
-              <span>&nbsp;&nbsp;</span>
-              <span>{{item.Organization}}</span>
+            <img src='http://expert.ckcest.cn/autoload/images/avatar.png'  @click="detail()"/>
+            <!-- <img src="static/img/common/exp.png" > -->
+            <div class="expert-text column">
+              <span :title="item.Name">{{item.Name}}</span>
+              <span :title="item.Organization.split(',')[0]">{{item.Organization.split(',')[0]}}</span>
               </div>
             </div>
           </div>
           <div class="expert-detail MT_20 ML_20 MR_20" v-else>
             <div class="detail-info row">
-              <img src="static/img/common/exp.png" class="MT_20 " >
+              <!-- <img src="static/img/common/exp.png" class="MT_20 " > -->
+              <img src='http://expert.ckcest.cn/autoload/images/avatar.png'  class="MT_20 " />
               <div class="info-content ML_20">
                 <p>李兰娟  浙江大学 院士</p>
                 <p>KID：1723658326</p>
@@ -217,23 +218,33 @@ export default {
           if (!res.data.length) {
             that.$message('无有效合作关系信息！')
           } else {
+            that.experts = []
+            res.data.forEach((item, index) => {
+              if (item.oClass === 'Expert') {
+                that.experts.push(item.oData)
+              }
+            })
             let temp = makeGraphData(res)
             let template = {
               show: true,
               formatter: '{b0}'
             }
-            if (!Object.keys(temp).length) {
+            if (!Object.keys(temp).length || that.experts.length !== temp.children.length) {
+              console.log(1)
+
               let children = []
               res.data.forEach((item, index) => {
-                let exp = {
-                  label: template,
-                  value: 'exp',
-                  index: index,
-                  collapsed: false,
-                  id: '#' + item.rid.cluster + ':' + item.rid.position,
-                  name: item.oData.Name
+                if (item.oClass === 'Expert') {
+                  let exp = {
+                    label: template,
+                    value: 'exp',
+                    index: index,
+                    collapsed: false,
+                    id: '#' + item.rid.cluster + ':' + item.rid.position,
+                    name: item.oData.Name
+                  }
+                  children.push(exp)
                 }
-                children.push(exp)
               })
               that.treeData = {
                 name: that.name,
@@ -242,7 +253,6 @@ export default {
               }
               return
             }
-
             temp.children.forEach((item, index) => {
               if (item === undefined) {
                 temp.children.splice(index, 1)
@@ -261,15 +271,11 @@ export default {
 
             let tree = {
               name: that.name,
+              id: '#' + res.data[0].rid.cluster + ':' + res.data[0].rid.position,
               children: []
             }
             tree.children[0] = temp
             that.treeData = tree
-            res.data.forEach((item, index) => {
-              if (item.oClass === 'Expert') {
-                that.experts.push(item.oData)
-              }
-            })
           }
         }
       })
@@ -287,9 +293,11 @@ export default {
           temp = res
         }
       })
-      console.log(makeGraphData(temp))
-
-      return makeGraphData(temp).id
+      if (!Object.keys(temp).length) {
+        return '#' + temp.data[0].rid.cluster + ':' + temp.data[0].rid.position
+      } else {
+        return makeGraphData(temp).id
+      }
     },
     detail () {
       this.typeInfo = 2
@@ -314,22 +322,30 @@ export default {
             that.searchShow = false
           } else {
             let temp = makeGraphData(res)
+            let experts = []
+            res.data.forEach((item, index) => {
+              if (item.oClass === 'Expert') {
+                experts.push(item.oData)
+              }
+            })
             let template = {
               show: true,
               formatter: '{b0}'
             }
-            if (!Object.keys(temp).length) {
+            if (!Object.keys(temp).length || experts.length !== temp.children.length) {
               let children = []
               res.data.forEach((item, index) => {
-                let exp = {
-                  label: template,
-                  value: 'exp',
-                  index: index,
-                  collapsed: false,
-                  id: '#' + item.rid.cluster + ':' + item.rid.position,
-                  name: item.oData.Name
+                if (item.oClass === 'Expert') {
+                  let exp = {
+                    label: template,
+                    value: 'exp',
+                    index: index,
+                    collapsed: false,
+                    id: '#' + item.rid.cluster + ':' + item.rid.position,
+                    name: item.oData.Name
+                  }
+                  children.push(exp)
                 }
-                children.push(exp)
               })
               that.treeData = {
                 name: that.name,
@@ -365,11 +381,13 @@ export default {
             }
             tree.children[0] = temp
             that.treeData = tree
-            res.data.forEach((item, index) => {
-              if (item.oClass === 'Expert') {
-                that.experts.push(item.oData)
-              }
-            })
+            // that.experts = []
+            // res.data.forEach((item, index) => {
+            //   if (item.oClass === 'Expert') {
+            //     that.experts.push(item.oData)
+            //   }
+            // })
+            that.typeInfo = 2
             that.showPath.push({name: name})
           }
         }
@@ -389,7 +407,7 @@ export default {
         let data = this.assemblyData(this.nodeName, this.nodeOrg)
         let p2 = this.getPid(data)
         let temp = {
-          teye: '4',
+          type: '4',
           p1: p1,
           p2: p2
         }
@@ -469,7 +487,13 @@ export default {
               height: 200px;
             }
             .expert-text{
-              text-align: center;
+              text-align: left;
+              span{
+                width: 150px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
             }
           }
         }
