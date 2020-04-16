@@ -5,6 +5,8 @@
         <img class="logo" src="static/img/common/logo2020-.png" />
       </el-col>
       <el-col :offset='12' :span="4">
+        <span @click="goHome">首页</span>
+        <span @click="goTalent">人才发现</span>
         <span>使用说明</span>
       </el-col>
     </el-row>
@@ -17,7 +19,19 @@ export default {
   data () {
     return {}
   },
-  methods: {}
+  methods: {
+    goTalent () {
+      this.$router.push({
+        path: '/talent'
+      })
+    },
+    goHome () {
+      this.$router.push({
+        path: '/'
+      })
+    }
+  }
+
 }
 </script>
 
