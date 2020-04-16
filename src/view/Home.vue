@@ -2,32 +2,32 @@
   <div class="layer">
     <div class="home" v-loading='loading'>
       <div class="home-header MT_50">
-        <el-divider content-position="left">学者联系路径发现</el-divider>
+        <el-divider content-position="left">学者合作路径查询</el-divider>
         <div class="home-header-search PR_20 PL_20">
-          <span>人名</span>
-          <el-input class="ML_30" v-model="name" placeholder="请输入姓名"></el-input>
-          <span class="ML_30">机构</span>
-          <el-input class="ML_30" v-model="org" placeholder="请输入机构"></el-input>
-          <el-button class="ML_30" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-          <el-link :underline="false" class="ML_30" @click="seniorSearch = !seniorSearch">高级搜索</el-link>
+          <span>查询人名</span>
+          <el-input class="ML_30" v-model="name" placeholder="必填"></el-input>
+          <span class="ML_30">查询机构</span>
+          <el-input class="ML_30" v-model="org" placeholder="必填"></el-input>
+          <!-- <el-link :underline="false" class="ML_30" @click="seniorSearch = !seniorSearch">高级搜索</el-link> -->
         </div>
-        <div class="home-header-search PR_20 PL_20" v-if="seniorSearch">
+        <div class="home-header-search PR_20 PL_20">
           <span >起点人名</span>
           <el-input v-model="startName" class="ML_30" placeholder="请输入姓名"></el-input>
-          <span class="ML_30">机构</span>
-          <el-input v-model="startOrg" class="ML_30" placeholder="请输入机构"></el-input>
+          <span class="ML_30">起点机构</span>
+          <el-input v-model="startOrg" class="ML_30" placeholder="必填"></el-input>
+          <el-button class="ML_30" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
+
         </div>
       </div>
       <div class="home-msg MT_50">
         <span style="color:red" v-if="experts.length > 10">当前查询到的结果较多，您可以通过输入机构进行筛选</span>
       </div>
-      <div class="home-body row MT_50" v-if="searchShow">
-        <div class="home-body-info MR_50">
+      <div class="home-body row MT_50">
+        <!-- <div class="home-body-info MR_50">
           <el-divider content-position="left">学者信息</el-divider>
-          <div class="info-experts row   PL_20" v-if="typeInfo === 1">
-          <div class="info-expert PR_20 MT_20 " v-for="(item, index) in experts.slice(0,9)" :key='index' >
+          <div class="info-experts row " v-if="typeInfo === 1">
+          <div class="info-expert  MT_20 " v-for="(item, index) in experts.slice(0,9)" :key='index' >
             <img src='http://expert.ckcest.cn/autoload/images/avatar.png'  @click="detail()"/>
-            <!-- <img src="static/img/common/exp.png" > -->
             <div class="expert-text column">
               <span :title="item.Name">{{item.Name}}</span>
               <span :title="item.Organization.split(',')[0]">{{item.Organization.split(',')[0]}}</span>
@@ -36,7 +36,6 @@
           </div>
           <div class="expert-detail MT_20 ML_20 MR_20" v-else>
             <div class="detail-info row">
-              <!-- <img src="static/img/common/exp.png" class="MT_20 " > -->
               <img src='http://expert.ckcest.cn/autoload/images/avatar.png'  class="MT_20 " />
               <div class="info-content ML_20">
                 <p>李兰娟  浙江大学 院士</p>
@@ -56,30 +55,27 @@
               <FoldBarChart :foldList="foldList || {}" style="-webkit-filter: saturate(0.5);filter: saturate(0.5);"></FoldBarChart>
             </div>
           </div>
-        </div>
+        </div> -->
 
-        <div class="home-body-relation ">
+        <div class="home-body-relation">
             <el-divider content-position="left">合作关系</el-divider>
-            <div class="relation-none" v-if="!treeData">
-              <span>暂无合作关系</span>
-            </div>
-            <div v-else class="PL_50 PR_50">
+            <div class="PL_50 PR_50">
               <div class="relation-top row ">
                  <div>
                   <span>展示路径：</span>
-                  <span v-for='(item, index) in showPath' :key='index' @click='clkPath(index)'>{{index > 0 ?'->':''}}{{item.name}} {{item.org?'('+ item.org +')':''}}</span>
+                  <!-- <span v-for='(item, index) in showPath' :key='index' @click='clkPath(index)'>{{index > 0 ?'->':''}}{{item.name}} {{item.org?'('+ item.org +')':''}}</span> -->
                  </div>
-                 <el-link icon="el-icon-circle-plus" :underline="false" @click="isNode = !isNode">添加节点 </el-link>
+                 <!-- <el-link icon="el-icon-circle-plus" :underline="false" @click="isNode = !isNode">添加节点 </el-link> -->
               </div>
-              <div class="relation-node row MT_30" v-if="isNode">
+              <!-- <div class="relation-node row MT_30" v-if="isNode">
                 <span>节点人名</span>
                 <el-input v-model="nodeName" placeholder="姓名"></el-input>
                 <span>节点机构</span>
                 <el-input v-model="nodeOrg" placeholder="机构"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="nodeSearch" class="ML_10">搜索</el-button>
-              </div>
+              </div> -->
               <div class="row relation-echart">
-                <TreeChart style="width:100%" :treeData='treeData' :left='left' class="MT_30" @name='clkName'></TreeChart>
+                <figureChart style="width:100%" :figureData='figureData'  class="MT_30" ></figureChart>
               </div>
             </div>
         </div>
@@ -90,15 +86,16 @@
 
 <script>
 // import { search } from '@/api/home'
-import FoldBarChart from '@/components/Charts/FoldBarChart'
-import TreeChart from '@/components/Charts/TreeChart'
+// import FoldBarChart from '@/components/Charts/FoldBarChart'
+// import TreeChart from '@/components/Charts/TreeChart'
+import figureChart from '@/components/Charts/figureChart'
 import $ from 'jquery'
 import { makeGraphData } from '@/utils/makeGraphData'
 export default {
   name: 'home',
   components: {
-    FoldBarChart,
-    TreeChart
+    figureChart
+    // TreeChart
   },
   data () {
     return {
@@ -112,50 +109,60 @@ export default {
       experts: [], // 专家列表
       typeInfo: 1, // info类型
       foldList: {}, // 图表数据
-      showPath: [],
-      left: '20%',
-      treeData: {},
-      isNode: false,
-      seniorSearch: false,
+      showPath: [], // 路径
+      left: '20%', // 图表左边距
+      figureData: {}, // 树图数据
+      isNode: false, // 是否添加点击
+      // seniorSearch: false, // 高级搜索
       loading: false // 加载判断
     }
   },
   methods: {
     // 搜索
     search () {
-      if (!this.name && !this.org) {
-        this.$message('必须输入其中一个关键词！')
+      // if (!this.name && !this.org &&) {
+      //   this.$message('必须输入其中一个关键词！')
+      //   return
+      // }
+      if (!this.name) {
+        this.$message('请输入查询姓名')
+        return
+      }
+      if (!this.org) {
+        this.$message('请输入查询机构')
+        return
+      }
+      if (!this.startOrg) {
+        this.$message('请输入起点机构')
         return
       }
       this.loading = true
       this.searchShow = true
-      this.typeInfo = 1
-      this.showPath = []
-      let name = this.name || ''
-      let org = this.org || ''
-      let path = {
-        name: name,
-        org: org
-      }
-      this.showPath.push(path)
+      // this.typeInfo = 1
+      // this.showPath = []
+      // let path = {
+      //   name: this.name || '',
+      //   org: this.org || ''
+      // }
+      // this.showPath.push(path)
+      // 如果有内容就代表高级搜索
       if (this.startOrg || this.startName) {
         let data = this.assemblyData(this.name, this.org)
         let p1 = this.getPid(data)
         let data2 = this.assemblyData(this.startName, this.startOrg)
         let p2 = this.getPid(data2)
+
         let temp = {
           type: '4',
           p1: p1,
           p2: p2
         }
-        let name = this.startName || ''
-        let org = this.startOrg || ''
         let path = {
-          name: name,
-          org: org
+          name: this.startName || '',
+          org: this.startOrg || ''
         }
         this.showPath.push(path)
-        this.getData(temp)
+        this.getData(temp, 4)
       } else {
         let data = this.assemblyData(this.name, this.org)
         this.getData(data)
@@ -206,7 +213,7 @@ export default {
       return data
     },
     // 获取数据
-    getData (data) {
+    getData (data, tpye) {
       let that = this
       $.ajax({
         type: 'post',
@@ -218,64 +225,51 @@ export default {
           if (!res.data.length) {
             that.$message('无有效合作关系信息！')
           } else {
-            that.experts = []
-            res.data.forEach((item, index) => {
-              if (item.oClass === 'Expert') {
-                that.experts.push(item.oData)
+            let temp = []
+            let nodes = res.chartdata.nodes.map((it, index) => {
+              temp.push({
+                rid: it.rid.cluster + it.rid.position
+              })
+              if (index) {
+                if (it.oClass === 'Organization') {
+                  return {
+                    name: it.oData.Name,
+                    category: 1,
+                    draggable: true
+                  }
+                } else if (it.oClass === 'Expert') {
+                  return {
+                    name: it.oData.Name + '\n' + '(' + it.oData.Organization + ')',
+                    category: 2,
+                    draggable: true
+                  }
+                }
+              } else {
+                return {
+                  name: it.oData.Name,
+                  draggable: true
+                }
               }
             })
-            let temp = makeGraphData(res)
-            let template = {
-              show: true,
-              formatter: '{b0}'
-            }
-            if (!Object.keys(temp).length || that.experts.length !== temp.children.length) {
-              console.log(1)
-
-              let children = []
-              res.data.forEach((item, index) => {
-                if (item.oClass === 'Expert') {
-                  let exp = {
-                    label: template,
-                    value: 'exp',
-                    index: index,
-                    collapsed: false,
-                    id: '#' + item.rid.cluster + ':' + item.rid.position,
-                    name: item.oData.Name
-                  }
-                  children.push(exp)
+            let lines = res.chartdata.lines.map(it => {
+              let startRid = it.start.rid.cluster + it.start.rid.position
+              let endRid = it.end.rid.cluster + it.end.rid.position
+              let source, target
+              temp.forEach((item, index) => {
+                if (startRid === item.rid) {
+                  source = index
+                }
+                if (endRid === item.rid) {
+                  target = index
                 }
               })
-              that.treeData = {
-                name: that.name,
-                id: '#' + res.data[0].rid.cluster + ':' + res.data[0].rid.position,
-                children: children
-              }
-              return
-            }
-            temp.children.forEach((item, index) => {
-              if (item === undefined) {
-                temp.children.splice(index, 1)
+              return {
+                source: source,
+                target: target,
+                value: it.type
               }
             })
-            temp.value = 'org'
-            temp.label = template
-            temp.collapsed = false
-            temp.index = 0
-            temp.children.forEach((item, index) => {
-              temp.children[index].label = template
-              temp.children[index].value = item.children.length ? 'org' : 'exp'
-              temp.children[index].index = index
-              temp.children[index].collapsed = false
-            })
-
-            let tree = {
-              name: that.name,
-              id: '#' + res.data[0].rid.cluster + ':' + res.data[0].rid.position,
-              children: []
-            }
-            tree.children[0] = temp
-            that.treeData = tree
+            that.figureData = Object.assign({}, that.figureData, { nodes: nodes, lines: lines })
           }
         }
       })
@@ -293,154 +287,156 @@ export default {
           temp = res
         }
       })
-      if (!Object.keys(temp).length) {
-        return '#' + temp.data[0].rid.cluster + ':' + temp.data[0].rid.position
-      } else {
-        return makeGraphData(temp).id
+      if (!temp.data.length) {
+        this.$message('无有效合作关系信息！')
+        this.loading = false
+        return
       }
-    },
-    detail () {
-      this.typeInfo = 2
-    },
-    // 点击图表姓名
-    clkName (name) {
-      console.log(name)
-      let that = this
-      let data = {
-        type: '1',
-        s_name: name
-      }
-      $.ajax({
-        type: 'post',
-        url: 'http://183.136.237.197/graph_db',
-        data: data,
-        dataType: 'json',
-        success: function (res) {
-          that.loading = false
-          if (!res.data.length) {
-            that.$message('无有效合作关系信息！')
-            that.searchShow = false
-          } else {
-            let temp = makeGraphData(res)
-            let experts = []
-            res.data.forEach((item, index) => {
-              if (item.oClass === 'Expert') {
-                experts.push(item.oData)
-              }
-            })
-            let template = {
-              show: true,
-              formatter: '{b0}'
-            }
-            if (!Object.keys(temp).length || experts.length !== temp.children.length) {
-              let children = []
-              res.data.forEach((item, index) => {
-                if (item.oClass === 'Expert') {
-                  let exp = {
-                    label: template,
-                    value: 'exp',
-                    index: index,
-                    collapsed: false,
-                    id: '#' + item.rid.cluster + ':' + item.rid.position,
-                    name: item.oData.Name
-                  }
-                  children.push(exp)
-                }
-              })
-              that.treeData = {
-                name: that.name,
-                id: '#' + res.data[0].rid.cluster + ':' + res.data[0].rid.position,
-                children: children
-              }
-              return
-            }
-            temp.children.forEach((item, index) => {
-              if (item === undefined) {
-                temp.children.splice(index, 1)
-              }
-            })
-            temp.children.forEach((item, index) => {
-              if (item === undefined) {
-                temp.children.splice(index, 1)
-              }
-            })
-            temp.value = 'org'
-            temp.label = template
-            temp.collapsed = false
-            temp.index = 0
-            temp.children.forEach((item, index) => {
-              temp.children[index].label = template
-              temp.children[index].value = item.children.length ? 'org' : 'exp'
-              temp.children[index].index = index
-              temp.children[index].collapsed = false
-            })
-
-            let tree = {
-              name: data.s_name,
-              children: []
-            }
-            tree.children[0] = temp
-            that.treeData = tree
-            // that.experts = []
-            // res.data.forEach((item, index) => {
-            //   if (item.oClass === 'Expert') {
-            //     that.experts.push(item.oData)
-            //   }
-            // })
-            that.typeInfo = 2
-            that.showPath.push({name: name})
-          }
-        }
-      })
-    },
-    // 点击路径
-    clkPath (index) {
-      let temp = this.showPath[index]
-      this.showPath.splice(index + 1, this.showPath.length - index)
-      let data = this.assemblyData(temp.name, temp.org)
-      this.getData(data)
-    },
-    // 添加节点
-    nodeSearch () {
-      if (this.nodeName || this.nodeOrg) {
-        let p1 = this.treeData.id
-        let data = this.assemblyData(this.nodeName, this.nodeOrg)
-        let p2 = this.getPid(data)
-        let temp = {
-          type: '4',
-          p1: p1,
-          p2: p2
-        }
-        this.getData(temp)
-        let name = this.nodeName || ''
-        let org = this.nodeOrg || ''
-        let path = {
-          name: name,
-          org: org
-        }
-        this.showPath.push(path)
-      } else {
-        this.$message('必须输入其中一个关键词！')
-      }
+      return '#' + temp.data[0].rid.cluster + ':' + temp.data[0].rid.position
     }
+    // detail () {
+    //   this.typeInfo = 2
+    // }
+    // 点击图表姓名
+    // clkName (name) {
+    //   console.log(name)
+    //   let that = this
+    //   let data = {
+    //     type: '1',
+    //     s_name: name
+    //   }
+    //   $.ajax({
+    //     type: 'post',
+    //     url: 'http://183.136.237.197/graph_db',
+    //     data: data,
+    //     dataType: 'json',
+    //     success: function (res) {
+    //       that.loading = false
+    //       if (!res.data.length) {
+    //         that.$message('无有效合作关系信息！')
+    //         that.searchShow = false
+    //       } else {
+    //         let temp = makeGraphData(res)
+    //         let experts = []
+    //         res.data.forEach((item, index) => {
+    //           if (item.oClass === 'Expert') {
+    //             experts.push(item.oData)
+    //           }
+    //         })
+    //         let template = {
+    //           show: true,
+    //           formatter: '{b0}'
+    //         }
+    //         if (!Object.keys(temp).length || experts.length !== temp.children.length) {
+    //           let children = []
+    //           res.data.forEach((item, index) => {
+    //             if (item.oClass === 'Expert') {
+    //               let exp = {
+    //                 label: template,
+    //                 value: 'exp',
+    //                 index: index,
+    //                 collapsed: false,
+    //                 id: '#' + item.rid.cluster + ':' + item.rid.position,
+    //                 name: item.oData.Name
+    //               }
+    //               children.push(exp)
+    //             }
+    //           })
+    //           // that.treeData = {
+    //           //   name: that.name,
+    //           //   id: '#' + res.data[0].rid.cluster + ':' + res.data[0].rid.position,
+    //           //   children: children
+    //           // }
+    //           return
+    //         }
+    //         temp.children.forEach((item, index) => {
+    //           if (item === undefined) {
+    //             temp.children.splice(index, 1)
+    //           }
+    //         })
+    //         temp.children.forEach((item, index) => {
+    //           if (item === undefined) {
+    //             temp.children.splice(index, 1)
+    //           }
+    //         })
+    //         temp.value = 'org'
+    //         temp.label = template
+    //         temp.collapsed = false
+    //         temp.index = 0
+    //         temp.children.forEach((item, index) => {
+    //           temp.children[index].label = template
+    //           temp.children[index].value = item.children.length ? 'org' : 'exp'
+    //           temp.children[index].index = index
+    //           temp.children[index].collapsed = false
+    //         })
+
+    //         let tree = {
+    //           name: data.s_name,
+    //           children: []
+    //         }
+    //         tree.children[0] = temp
+    //         // that.treeData = tree
+    //         // that.experts = []
+    //         // res.data.forEach((item, index) => {
+    //         //   if (item.oClass === 'Expert') {
+    //         //     that.experts.push(item.oData)
+    //         //   }
+    //         // })
+    //         that.typeInfo = 2
+    //         that.showPath.push({name: name})
+    //       }
+    //     }
+    //   })
+    // },
+    // 点击路径
+    // clkPath (index) {
+    //   let temp = this.showPath[index]
+    //   this.showPath.splice(index + 1, this.showPath.length - index)
+    //   let data = this.assemblyData(temp.name, temp.org)
+    //   this.getData(data)
+    // },
+    // 添加节点
+    // nodeSearch () {
+    //   if (this.nodeName || this.nodeOrg) {
+    //     let p1 = this.treeData.id
+    //     let data = this.assemblyData(this.nodeName, this.nodeOrg)
+    //     let p2 = this.getPid(data)
+    //     let temp = {
+    //       type: '4',
+    //       p1: p1,
+    //       p2: p2
+    //     }
+    //     this.getData(temp, 4)
+    //     let name = this.nodeName || ''
+    //     let org = this.nodeOrg || ''
+    //     let path = {
+    //       name: name,
+    //       org: org
+    //     }
+    //     this.showPath.push(path)
+    //   } else {
+    //     this.$message('必须输入其中一个关键词！')
+    //   }
+    // }
   },
   mounted () {
   },
   watch: {
-    seniorSearch: {
-      deep: true,
-      handler (val) {
-        this.startName = ''
-        this.startOrg = ''
-      }
-    },
-    isNode: {
-      deep: true,
-      handler (val) {
-        this.nodeOrg = ''
-        this.nodeName = ''
-      }
-    }
+
+    // seniorSearch: {
+    //   deep: true,
+    //   handler (val) {
+    //     this.startName = ''
+    //     this.startOrg = ''
+    //   }
+    // },
+    // isNode: {
+    //   deep: true,
+    //   handler (val) {
+    //     this.nodeOrg = ''
+    //     this.nodeName = ''
+    //   }
+    // }
   }
 }
 </script>
@@ -481,15 +477,18 @@ export default {
         .info-experts{
           flex-wrap:wrap;
           margin-bottom: 44px;
+           margin-right: 1%;
           .info-expert{
+            width: 32%;
+            margin-left: 1%;
+            text-align: center;
             img{
               width: 150px;
               height: 200px;
             }
             .expert-text{
-              text-align: left;
+              text-align: center;
               span{
-                width: 150px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;

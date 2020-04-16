@@ -28,7 +28,7 @@ export default {
     },
     height: {
       type: String,
-      default: '350px'
+      default: '550px'
     },
     treeData: {
       type: Object,
