@@ -8,7 +8,13 @@
           <el-input class="ML_30" v-model="name" placeholder="必填"></el-input>
           <span class="ML_30">查询机构</span>
           <el-input class="ML_30" v-model="org" placeholder="必填"></el-input>
-          <el-button class="ML_30" type="primary" icon="el-icon-search" @click="search" :loading="loading">搜索</el-button>
+          <el-button
+            class="ML_30"
+            type="primary"
+            icon="el-icon-search"
+            @click="search"
+            :loading="loading"
+          >搜索</el-button>
         </div>
       </div>
       <div class="home-body row MT_50" v-if="searchShow">
@@ -25,7 +31,7 @@
             </div>
           </div>
         </div>
-                <div class="home-body-relation">
+        <div class="home-body-relation">
           <el-divider content-position="left">合作关系</el-divider>
           <div class="PL_50 PR_50">
             <div class="relation-top row">
@@ -38,13 +44,12 @@
             </div>
           </div>
         </div>
-                <div class="home-body-relation">
+        <div class="home-body-relation">
           <el-divider content-position="left">合作关系</el-divider>
           <div class="PL_50 PR_50">
             <div class="relation-top row">
               <div>
                 <span>展示路径：{{showPath}}同领域中国学者</span>
-
               </div>
             </div>
             <div class="row relation-echart">
@@ -53,7 +58,7 @@
           </div>
         </div>
       </div>
-    <div class="home-body row MT_50" v-if="searchShow">
+      <div class="home-body row MT_50" v-if="searchShow">
         <div class="home-body-relation">
           <el-divider content-position="left">合作关系</el-divider>
           <div class="PL_50 PR_50">
@@ -63,26 +68,14 @@
               </div>
             </div>
             <div class="row relation-echart">
-               <el-table
-                  :data="tableData1"
-                  border
-                  style="width: 100%">
-                  <el-table-column
-                    prop="name"
-                    label="姓名"
-                    width="180">
-                  </el-table-column>
-                  <el-table-column
-                    prop="org"
-                    label="机构"
-                    width="180">
-                  </el-table-column>
-
-                </el-table>
+              <el-table :data="tableData1" border style="width: 100%">
+                <el-table-column prop="name" label="姓名" width="180"></el-table-column>
+                <el-table-column prop="org" label="机构" width="180"></el-table-column>
+              </el-table>
             </div>
           </div>
         </div>
-                <div class="home-body-relation">
+        <div class="home-body-relation">
           <el-divider content-position="left">合作关系</el-divider>
           <div class="PL_50 PR_50">
             <div class="relation-top row">
@@ -91,56 +84,46 @@
               </div>
             </div>
             <div class="row relation-echart">
-                             <el-table
-                  :data="tableData1"
-                  border
-                  style="width: 100%">
-                  <el-table-column
-                    prop="name"
-                    label="姓名"
-                    width="180">
-                  </el-table-column>
-                  <el-table-column
-                    prop="org"
-                    label="机构"
-                    width="180">
-                  </el-table-column>
-
-                </el-table>
+              <el-table :data="tableData1" border style="width: 100%">
+                <el-table-column prop="name" label="姓名" width="180"></el-table-column>
+                <el-table-column prop="org" label="机构" width="180"></el-table-column>
+                <el-table-column fixed="right" label="操作" width="120">
+                  <template slot-scope="scope">
+                    <el-button type="primary" size="mini" @click="query(scope.row)">查询</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
             </div>
           </div>
         </div>
-                <div class="home-body-relation">
+        <div class="home-body-relation">
           <el-divider content-position="left">合作关系</el-divider>
           <div class="PL_50 PR_50">
             <div class="relation-top row">
               <div>
                 <span>展示路径：{{showPath}}同领域中国学者</span>
-
               </div>
             </div>
             <div class="row relation-echart">
-                             <el-table
-                  :data="tableData1"
-                  border
-                  style="width: 100%">
-                  <el-table-column
-                    prop="name"
-                    label="姓名"
-                    width="180">
-                  </el-table-column>
-                  <el-table-column
-                    prop="org"
-                    label="机构"
-                    width="180">
-                  </el-table-column>
-
-                </el-table>
+              <el-table :data="tableData1" border style="width: 100%">
+                <el-table-column prop="name" label="姓名" ></el-table-column>
+                <el-table-column prop="org" label="机构" ></el-table-column>
+              </el-table>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="60%" :before-close="handleClose">
+      <el-table :data="tableData4" border style="width: 100%">
+        <el-table-column prop="oData.Name" label="姓名" ></el-table-column>
+        <el-table-column prop="oData.Organization" label="机构" ></el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -164,6 +147,8 @@ export default {
       tableData1: [],
       tableData2: [],
       tableData3: [],
+      tableData4: [],
+      dialogVisible: false,
       loading: false // 加载判断
     }
   },
@@ -441,6 +426,29 @@ export default {
         return
       }
       return '#' + temp.data[0].rid.cluster + ':' + temp.data[0].rid.position
+    },
+    // 查询
+    query (data) {
+      let that = this
+      let ass = this.assemblyData(data.name, data.org)
+      let p1 = this.getPid(ass)
+      let temp = {
+        type: '5',
+        p1: p1
+      }
+      $.ajax({
+        type: 'post',
+        url: 'http://183.136.237.197/graph_db',
+        data: temp,
+        dataType: 'json',
+        success: function (res) {
+          that.dialogVisible = true
+          that.tableData4 = res.data
+        }
+      })
+    },
+    handleClose () {
+      this.dialogVisible = true
     }
   },
   mounted () {},
