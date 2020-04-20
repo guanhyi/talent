@@ -68,7 +68,6 @@ export default {
       if (!Object.keys(this.figureData).length) {
         return
       }
-      console.log(this.figureData)
 
       this.chart.setOption({
         title: {
@@ -101,21 +100,21 @@ export default {
               name: '查询',
               itemStyle: {
                 normal: {
-                  color: '#FF7F50'
+                  color: '#003366'
                 }
               }
             }, {
               name: '机构',
               itemStyle: {
                 normal: {
-                  color: '#1E90FF'
+                  color: '#3399CC'
                 }
               }
             }, {
               name: '专家',
               itemStyle: {
                 normal: {
-                  color: '#FF1493'
+                  color: '#99CCFF'
                 }
               }
             }, {
@@ -130,7 +129,7 @@ export default {
               normal: {
                 show: true,
                 textStyle: {
-                  fontSize: 12
+                  fontSize: 16
                 }
               }
             },
@@ -159,23 +158,6 @@ export default {
           }
         ]
       })
-      console.log(this.chart.getOption())
-      // let that = this
-      // this.chart.on('click', function (data) {
-      //   if (data.value === 'org') {
-      //     if (!data.data.collapsed) {
-      //       that.treeData.children[data.data.index].collapsed = !data.data.collapsed
-      //       if (data.data.children.length) {
-      //         that.treeData.children[data.data.index].label.formatter = '{b0}(' + data.data.children.length + ')'
-      //       }
-      //     } else {
-      //       that.treeData.children[data.data.index].collapsed = !data.data.collapsed
-      //       that.treeData.children[data.data.index].label.formatter = '{b0}'
-      //     }
-      //   } else if (data.value === 'exp') {
-      //     that.$emit('name', data.name)
-      //   }
-      // })
     }
   }
 }
