@@ -13,13 +13,12 @@
             type="primary"
             icon="el-icon-search"
             @click="search"
-            :loading="loading"
           >搜索</el-button>
         </div>
       </div>
-      <div class="home-body row MT_50" v-if="searchShow">
+      <!-- <div class="home-body row MT_50" v-if="searchShow">
         <div class="home-body-relation">
-          <el-divider content-position="left">合作关系</el-divider>
+          <el-divider content-position="left">合作路径</el-divider>
           <div class="PL_50 PR_50">
             <div class="relation-top row">
               <div>
@@ -32,7 +31,7 @@
           </div>
         </div>
         <div class="home-body-relation">
-          <el-divider content-position="left">合作关系</el-divider>
+          <el-divider content-position="left">合作路径</el-divider>
           <div class="PL_50 PR_50">
             <div class="relation-top row">
               <div>
@@ -45,7 +44,7 @@
           </div>
         </div>
         <div class="home-body-relation">
-          <el-divider content-position="left">合作关系</el-divider>
+          <el-divider content-position="left">合作路径</el-divider>
           <div class="PL_50 PR_50">
             <div class="relation-top row">
               <div>
@@ -57,10 +56,10 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
       <div class="home-body row MT_50" v-if="searchShow">
         <div class="home-body-relation">
-          <el-divider content-position="left">合作关系</el-divider>
+          <el-divider content-position="left">合作路径</el-divider>
           <div class="PL_50 PR_50">
             <div class="relation-top row">
               <div>
@@ -69,14 +68,15 @@
             </div>
             <div class="row relation-echart">
               <el-table :data="tableData1" border style="width: 100%">
-                <el-table-column prop="name" label="姓名" width="180"></el-table-column>
-                <el-table-column prop="org" label="机构" width="180"></el-table-column>
+                <el-table-column prop="name" label="姓名"></el-table-column>
+                <el-table-column prop="org" label="机构" ></el-table-column>
+                <el-table-column prop="Email" label="邮箱" ></el-table-column>
               </el-table>
             </div>
           </div>
         </div>
         <div class="home-body-relation">
-          <el-divider content-position="left">合作关系</el-divider>
+          <el-divider content-position="left">合作路径</el-divider>
           <div class="PL_50 PR_50">
             <div class="relation-top row">
               <div>
@@ -84,10 +84,11 @@
               </div>
             </div>
             <div class="row relation-echart">
-              <el-table :data="tableData1" border style="width: 100%">
-                <el-table-column prop="name" label="姓名" width="180"></el-table-column>
-                <el-table-column prop="org" label="机构" width="180"></el-table-column>
-                <el-table-column fixed="right" label="操作" width="120">
+              <el-table :data="tableData2" border style="width: 100%">
+                <el-table-column prop="name" label="姓名"></el-table-column>
+                <el-table-column prop="org" label="机构" ></el-table-column>
+                <el-table-column prop="Email" label="邮箱" ></el-table-column>
+                <el-table-column fixed="right" label="操作" >
                   <template slot-scope="scope">
                     <el-button type="primary" size="mini" @click="query(scope.row)">查询</el-button>
                   </template>
@@ -97,7 +98,7 @@
           </div>
         </div>
         <div class="home-body-relation">
-          <el-divider content-position="left">合作关系</el-divider>
+          <el-divider content-position="left">合作路径</el-divider>
           <div class="PL_50 PR_50">
             <div class="relation-top row">
               <div>
@@ -105,19 +106,21 @@
               </div>
             </div>
             <div class="row relation-echart">
-              <el-table :data="tableData1" border style="width: 100%">
+              <el-table :data="tableData3" border style="width: 100%">
                 <el-table-column prop="name" label="姓名" ></el-table-column>
                 <el-table-column prop="org" label="机构" ></el-table-column>
+                <el-table-column prop="Email" label="邮箱" ></el-table-column>
               </el-table>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <el-dialog title="提示" :visible.sync="dialogVisible" width="60%" :before-close="handleClose">
+    <el-dialog title="查询" :visible.sync="dialogVisible" width="60%" :before-close="handleClose">
       <el-table :data="tableData4" border style="width: 100%">
         <el-table-column prop="oData.Name" label="姓名" ></el-table-column>
         <el-table-column prop="oData.Organization" label="机构" ></el-table-column>
+        <el-table-column prop="oData.Email" label="邮箱" ></el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -232,11 +235,10 @@ export default {
       let that = this
       $.ajax({
         type: 'post',
-        url: 'http://183.136.237.197/graph_db',
+        url: 'http://183.136.237.195/graph_db',
         data: data,
         dataType: 'json',
         success: function (res) {
-          that.loading = false
           if (!res.data.length) {
             that.$message('无有效合作关系信息！')
           } else {
@@ -286,6 +288,7 @@ export default {
                 }
 
                 that.tableData1.push({
+                  Email: item.oData.Email,
                   name: item.oData.Name,
                   org: item.oData.Organization
                 })
@@ -339,6 +342,7 @@ export default {
                   })
                 }
                 that.tableData2.push({
+                  Email: item.oData.Email,
                   name: item.oData.Name,
                   org: item.oData.Organization
                 })
@@ -392,11 +396,13 @@ export default {
                     draggable: true
                   })
                   that.tableData3.push({
+                    Email: item.oData.Email,
                     name: item.oData.Name,
                     org: item.oData.Organization
                   })
                 }
               })
+              that.loading = false
               that.showPath = that.name + '(' + that.org + ')'
               that.figureData3 = Object.assign({}, that.figureData3, {
                 nodes: nodes,
@@ -412,7 +418,7 @@ export default {
       let temp
       $.ajax({
         type: 'post',
-        url: 'http://183.136.237.197/graph_db',
+        url: 'http://183.136.237.195/graph_db',
         data: data,
         dataType: 'json',
         async: false,
@@ -429,6 +435,7 @@ export default {
     },
     // 查询
     query (data) {
+      this.loading = true
       let that = this
       let ass = this.assemblyData(data.name, data.org)
       let p1 = this.getPid(ass)
@@ -438,17 +445,20 @@ export default {
       }
       $.ajax({
         type: 'post',
-        url: 'http://183.136.237.197/graph_db',
+        url: 'http://183.136.237.195/graph_db',
         data: temp,
         dataType: 'json',
         success: function (res) {
           that.dialogVisible = true
           that.tableData4 = res.data
+          console.log(that.tableData4[0].oData)
+
+          that.loading = false
         }
       })
     },
     handleClose () {
-      this.dialogVisible = true
+      this.dialogVisible = false
     }
   },
   mounted () {},
