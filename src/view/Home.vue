@@ -8,12 +8,7 @@
           <el-input class="ML_30" v-model="name" placeholder="必填"></el-input>
           <span class="ML_30">查询机构</span>
           <el-input class="ML_30" v-model="org" placeholder="必填"></el-input>
-          <el-button
-            class="ML_30"
-            type="primary"
-            icon="el-icon-search"
-            @click="search"
-          >搜索</el-button>
+          <el-button class="ML_30" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
         </div>
       </div>
       <!-- <div class="home-body row MT_50" v-if="searchShow">
@@ -56,7 +51,7 @@
             </div>
           </div>
         </div>
-      </div> -->
+      </div>-->
       <div class="home-body row MT_50" v-if="searchShow">
         <div class="home-body-relation">
           <el-divider content-position="left">合作路径</el-divider>
@@ -66,13 +61,14 @@
                 <span>展示路径：{{showPath}}论文合作学者</span>
               </div>
             </div>
-            <div class="row relation-echart">
+            <div class="row relation-echart" v-if="haveData">
               <el-table :data="tableData1" border style="width: 100%">
                 <el-table-column prop="name" label="姓名"></el-table-column>
-                <el-table-column prop="org" label="机构" ></el-table-column>
-                <el-table-column prop="Email" label="邮箱" ></el-table-column>
+                <el-table-column prop="org" label="机构"></el-table-column>
+                <el-table-column prop="Email" label="邮箱"></el-table-column>
               </el-table>
             </div>
+            <div v-else class="none">无符合此条件学者</div>
           </div>
         </div>
         <div class="home-body-relation">
@@ -83,20 +79,22 @@
                 <span>展示路径：{{showPath}}同机构学者</span>
               </div>
             </div>
-            <div class="row relation-echart">
+            <div class="row relation-echart" v-if="haveData">
               <el-table :data="tableData2" border style="width: 100%">
                 <el-table-column prop="name" label="姓名"></el-table-column>
-                <el-table-column prop="org" label="机构" ></el-table-column>
-                <el-table-column prop="Email" label="邮箱" ></el-table-column>
-                <el-table-column fixed="right" label="操作" >
+                <el-table-column prop="org" label="机构"></el-table-column>
+                <el-table-column prop="Email" label="邮箱"></el-table-column>
+                <el-table-column fixed="right" label="操作">
                   <template slot-scope="scope">
                     <el-button type="primary" size="mini" @click="query(scope.row)">查询</el-button>
                   </template>
                 </el-table-column>
               </el-table>
             </div>
+            <div v-else class="none">无符合此条件学者</div>
           </div>
         </div>
+
         <div class="home-body-relation">
           <el-divider content-position="left">合作路径</el-divider>
           <div class="PL_50 PR_50">
@@ -105,22 +103,45 @@
                 <span>展示路径：{{showPath}}同领域中国学者</span>
               </div>
             </div>
-            <div class="row relation-echart">
+            <div class="row relation-echart" v-if="haveData">
               <el-table :data="tableData3" border style="width: 100%">
-                <el-table-column prop="name" label="姓名" ></el-table-column>
-                <el-table-column prop="org" label="机构" ></el-table-column>
-                <el-table-column prop="Email" label="邮箱" ></el-table-column>
+                <el-table-column prop="name" label="姓名"></el-table-column>
+                <el-table-column prop="org" label="机构"></el-table-column>
+                <el-table-column prop="Email" label="邮箱"></el-table-column>
               </el-table>
             </div>
+            <div v-else class="none">无符合此条件学者</div>
+          </div>
+        </div>
+      </div>
+      <i class="el-icon-bottom" v-if="searchShow"></i>
+
+      <div class="home-body row MT_50" v-if="searchShow">
+        <div class="home-body-relation" style="margin-left:33%">
+          <el-divider content-position="left">合作路径</el-divider>
+          <div class="PL_50 PR_50">
+            <div class="relation-top row">
+              <div>
+                <span>展示路径：{{showPath}}同机构学者的中国论文合作者</span>
+              </div>
+            </div>
+            <div class="row relation-echart" v-if="haveData">
+              <el-table :data="tableData5" border style="width: 100%">
+                <el-table-column prop="name" label="姓名"></el-table-column>
+                <el-table-column prop="org" label="机构"></el-table-column>
+                <el-table-column prop="Email" label="邮箱"></el-table-column>
+              </el-table>
+            </div>
+            <div v-else class="none">无符合此条件学者</div>
           </div>
         </div>
       </div>
     </div>
     <el-dialog title="查询" :visible.sync="dialogVisible" width="60%" :before-close="handleClose">
       <el-table :data="tableData4" border style="width: 100%">
-        <el-table-column prop="oData.Name" label="姓名" ></el-table-column>
-        <el-table-column prop="oData.Organization" label="机构" ></el-table-column>
-        <el-table-column prop="oData.Email" label="邮箱" ></el-table-column>
+        <el-table-column prop="oData.Name" label="姓名"></el-table-column>
+        <el-table-column prop="oData.Organization" label="机构"></el-table-column>
+        <el-table-column prop="oData.Email" label="邮箱"></el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -141,16 +162,18 @@ export default {
   data () {
     return {
       searchShow: false, // 是否第一次查询
-      name: '', // 姓名git remote add origin https://github.com/deskOfDafa/CoreAnimationDemo.git
-      org: '', // 机构
+      name: 'zhuang,yueting', // 姓名git remote add origin https://github.com/deskOfDafa/CoreAnimationDemo.git
+      org: 'zhejiang univ', // 机构
       showPath: '', // 路径
       figureData1: {}, // 图表数据
       figureData2: {}, // 图表数据
       figureData3: {}, // 图表数据
+      haveData: true,
       tableData1: [],
       tableData2: [],
       tableData3: [],
       tableData4: [],
+      tableData5: [],
       dialogVisible: false,
       loading: false // 加载判断
     }
@@ -168,6 +191,8 @@ export default {
       }
       this.loading = true
       this.searchShow = true
+      this.showPath = this.name + '(' + this.org + ')'
+
       let data = this.assemblyData(this.name, this.org)
       let p1 = this.getPid(data)
       let temp1 = {
@@ -239,41 +264,19 @@ export default {
         data: data,
         dataType: 'json',
         success: function (res) {
-          if (!res.data.length) {
-            that.$message('无有效合作关系信息！')
-          } else {
-            if (type === 5) {
-              let nodes = []
-              let lines = []
-              that.tableData1 = []
-              res.data.forEach((item, index) => {
-                if (index) {
-                  if (item.oClass === 'Organization') {
-                    nodes.push({
-                      name: item.oData.Name + index,
-                      category: 1,
-                      draggable: true
-                    })
-                  } else if (item.oClass === 'Expert') {
-                    nodes.push({
-                      name:
-                        item.oData.Name +
-                        '\n' +
-                        '(' +
-                        item.oData.Organization +
-                        ')' +
-                        index,
-                      category: 2,
-                      draggable: true
-                    })
-                  }
-                  lines.push({
-                    source: 0,
-                    rid: item.rid.cluster + item.rid.position,
-                    target: index,
-                    value: '合作关系'
+          if (type === 5) {
+            let nodes = []
+            let lines = []
+            that.tableData1 = []
+            res.data.forEach((item, index) => {
+              if (index) {
+                if (item.oClass === 'Organization') {
+                  nodes.push({
+                    name: item.oData.Name + index,
+                    category: 1,
+                    draggable: true
                   })
-                } else {
+                } else if (item.oClass === 'Expert') {
                   nodes.push({
                     name:
                       item.oData.Name +
@@ -282,133 +285,158 @@ export default {
                       item.oData.Organization +
                       ')' +
                       index,
-                    category: 0,
+                    category: 2,
                     draggable: true
                   })
                 }
+                lines.push({
+                  source: 0,
+                  rid: item.rid.cluster + item.rid.position,
+                  target: index,
+                  value: '合作关系'
+                })
+              } else {
+                nodes.push({
+                  name:
+                    item.oData.Name +
+                    '\n' +
+                    '(' +
+                    item.oData.Organization +
+                    ')' +
+                    index,
+                  category: 0,
+                  draggable: true
+                })
+              }
 
-                that.tableData1.push({
+              that.tableData1.push({
+                Email: item.oData.Email,
+                name: item.oData.Name,
+                org: item.oData.Organization
+              })
+            })
+            that.figureData1 = Object.assign({}, that.figureData1, {
+              nodes: nodes,
+              lines: lines
+            })
+          }
+          if (type === 6) {
+            let nodes = []
+            let lines = []
+            that.tableData2 = []
+            that.tableData5 = []
+            res.data.forEach((item, index) => {
+              if (index) {
+                if (item.oClass === 'Organization') {
+                  nodes.push({
+                    name: item.oData.Name + index,
+                    category: 1,
+                    draggable: true
+                  })
+                } else if (item.oClass === 'Expert') {
+                  nodes.push({
+                    name:
+                      item.oData.Name +
+                      '\n' +
+                      '(' +
+                      item.oData.Organization +
+                      ')' +
+                      index,
+                    category: 2,
+                    draggable: true
+                  })
+                }
+                lines.push({
+                  source: 0,
+                  target: index,
+                  value: ''
+                })
+              } else {
+                nodes.push({
+                  name:
+                    item.oData.Name +
+                    '\n' +
+                    '(' +
+                    item.oData.Organization +
+                    ')' +
+                    index,
+                  category: 0,
+                  draggable: true
+                })
+              }
+              that.tableData2.push({
+                Email: item.oData.Email,
+                name: item.oData.Name,
+                org: item.oData.Organization
+              })
+            })
+            that.tableData5 = res.coauthorsdata.map(it => {
+              return {
+                Email: it.oData.Email,
+                name: it.oData.Name,
+                org: it.oData.Organization
+              }
+            })
+
+            that.figureData2 = Object.assign({}, that.figureData2, {
+              nodes: nodes,
+              lines: lines
+            })
+          }
+          if (type === 7) {
+            let nodes = []
+            let lines = []
+            that.tableData3 = []
+            res.data.forEach((item, index) => {
+              if (index) {
+                if (item.oClass === 'Organization') {
+                  nodes.push({
+                    name: item.oData.Name + index,
+                    category: 1,
+                    draggable: true
+                  })
+                } else if (item.oClass === 'Expert') {
+                  nodes.push({
+                    name:
+                      item.oData.Name +
+                      '\n' +
+                      '(' +
+                      item.oData.Organization +
+                      ')' +
+                      index,
+                    category: 2,
+                    draggable: true
+                  })
+                }
+                lines.push({
+                  source: 0,
+                  target: index,
+                  value: ''
+                })
+              } else {
+                nodes.push({
+                  name:
+                    item.oData.Name +
+                    '\n' +
+                    '(' +
+                    item.oData.Organization +
+                    ')' +
+                    index,
+                  category: 0,
+                  draggable: true
+                })
+                that.tableData3.push({
                   Email: item.oData.Email,
                   name: item.oData.Name,
                   org: item.oData.Organization
                 })
-              })
-              that.figureData1 = Object.assign({}, that.figureData1, {
-                nodes: nodes,
-                lines: lines
-              })
-            }
-            if (type === 6) {
-              let nodes = []
-              let lines = []
-              that.tableData2 = []
-              res.data.forEach((item, index) => {
-                if (index) {
-                  if (item.oClass === 'Organization') {
-                    nodes.push({
-                      name: item.oData.Name + index,
-                      category: 1,
-                      draggable: true
-                    })
-                  } else if (item.oClass === 'Expert') {
-                    nodes.push({
-                      name:
-                        item.oData.Name +
-                        '\n' +
-                        '(' +
-                        item.oData.Organization +
-                        ')' +
-                        index,
-                      category: 2,
-                      draggable: true
-                    })
-                  }
-                  lines.push({
-                    source: 0,
-                    target: index,
-                    value: ''
-                  })
-                } else {
-                  nodes.push({
-                    name:
-                      item.oData.Name +
-                      '\n' +
-                      '(' +
-                      item.oData.Organization +
-                      ')' +
-                      index,
-                    category: 0,
-                    draggable: true
-                  })
-                }
-                that.tableData2.push({
-                  Email: item.oData.Email,
-                  name: item.oData.Name,
-                  org: item.oData.Organization
-                })
-              })
-
-              that.figureData2 = Object.assign({}, that.figureData2, {
-                nodes: nodes,
-                lines: lines
-              })
-            }
-            if (type === 7) {
-              let nodes = []
-              let lines = []
-              that.tableData3 = []
-              res.data.forEach((item, index) => {
-                if (index) {
-                  if (item.oClass === 'Organization') {
-                    nodes.push({
-                      name: item.oData.Name + index,
-                      category: 1,
-                      draggable: true
-                    })
-                  } else if (item.oClass === 'Expert') {
-                    nodes.push({
-                      name:
-                        item.oData.Name +
-                        '\n' +
-                        '(' +
-                        item.oData.Organization +
-                        ')' +
-                        index,
-                      category: 2,
-                      draggable: true
-                    })
-                  }
-                  lines.push({
-                    source: 0,
-                    target: index,
-                    value: ''
-                  })
-                } else {
-                  nodes.push({
-                    name:
-                      item.oData.Name +
-                      '\n' +
-                      '(' +
-                      item.oData.Organization +
-                      ')' +
-                      index,
-                    category: 0,
-                    draggable: true
-                  })
-                  that.tableData3.push({
-                    Email: item.oData.Email,
-                    name: item.oData.Name,
-                    org: item.oData.Organization
-                  })
-                }
-              })
-              that.loading = false
-              that.showPath = that.name + '(' + that.org + ')'
-              that.figureData3 = Object.assign({}, that.figureData3, {
-                nodes: nodes,
-                lines: lines
-              })
-            }
+              }
+            })
+            that.loading = false
+            that.figureData3 = Object.assign({}, that.figureData3, {
+              nodes: nodes,
+              lines: lines
+            })
           }
         }
       })
@@ -427,6 +455,7 @@ export default {
         }
       })
       if (!temp.data.length) {
+        this.haveData = false
         this.$message('无有效合作关系信息！')
         this.loading = false
         return
@@ -489,7 +518,12 @@ export default {
       }
     }
   }
+  .el-icon-bottom {
+    font-size: 4em;
+    margin-left: 48%;
+  }
   .home-body {
+    margin-bottom: 40px;
     .home-body-info {
       width: 700px;
       border-left: 1px solid #dcdfe6;
@@ -535,7 +569,8 @@ export default {
       }
     }
     .home-body-relation {
-      width: 1000px;
+      min-height: 200px;
+      width: 33%;
       border-left: 1px solid #dcdfe6;
       border-right: 1px solid #dcdfe6;
       border-bottom: 1px solid #dcdfe6;
@@ -562,6 +597,10 @@ export default {
       }
       .relation-echart {
         justify-content: space-between;
+      }
+      .none{
+        margin-top: 50px;
+        text-align: center;
       }
     }
   }

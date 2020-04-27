@@ -17,7 +17,7 @@ module.exports = {
         pathRewrite: {
           '^/api': ''
         }
-      },
+      }
     },
 
     // Various Dev Server settings
@@ -58,8 +58,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: './',
-
+    assetsPublicPath: '/expert/',
     /**
      * Source Maps
      */
