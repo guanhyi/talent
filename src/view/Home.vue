@@ -76,7 +76,8 @@
           <div class="PL_50 PR_50">
             <div class="relation-top row">
               <div>
-                <span>展示路径：{{showPath}}同机构学者</span>
+                <span>展示路径：{{showPath}}的同事</span>
+                <p>注：同事的范围定为在同期刊发文的同机构学者</p>
               </div>
             </div>
             <div class="row relation-echart" v-if="haveData">
@@ -122,7 +123,8 @@
           <div class="PL_50 PR_50">
             <div class="relation-top row">
               <div>
-                <span>展示路径：{{showPath}}同机构学者的中国论文合作者</span>
+                <span>展示路径：{{showPath}}同事的中国论文合作者</span>
+                <p>注：同领域的范围定为同期刊发文学者</p>
               </div>
             </div>
             <div class="row relation-echart" v-if="haveData">
@@ -162,8 +164,8 @@ export default {
   data () {
     return {
       searchShow: false, // 是否第一次查询
-      name: 'zhuang,yueting', // 姓名git remote add origin https://github.com/deskOfDafa/CoreAnimationDemo.git
-      org: 'zhejiang univ', // 机构
+      name: '', // 姓名
+      org: '', // 机构
       showPath: '', // 路径
       figureData1: {}, // 图表数据
       figureData2: {}, // 图表数据
@@ -189,6 +191,7 @@ export default {
         this.$message('请输入查询机构')
         return
       }
+      this.haveData = true
       this.loading = true
       this.searchShow = true
       this.showPath = this.name + '(' + this.org + ')'
@@ -308,6 +311,7 @@ export default {
                   draggable: true
                 })
               }
+              console.log(that.tableData1)
 
               that.tableData1.push({
                 Email: item.oData.Email,
@@ -425,12 +429,12 @@ export default {
                   category: 0,
                   draggable: true
                 })
-                that.tableData3.push({
-                  Email: item.oData.Email,
-                  name: item.oData.Name,
-                  org: item.oData.Organization
-                })
               }
+              that.tableData3.push({
+                Email: item.oData.Email,
+                name: item.oData.Name,
+                org: item.oData.Organization
+              })
             })
             that.loading = false
             that.figureData3 = Object.assign({}, that.figureData3, {
