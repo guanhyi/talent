@@ -62,8 +62,10 @@
               </div>
             </div>
             <div class="row relation-echart" v-if="haveData">
-              <el-table :data="tableData1" border style="width: 100%">
-                <el-table-column prop="name" label="姓名"></el-table-column>
+              <el-table :data="tableData1" border style="width: 100%"  :row-class-name="tableRowClassName">
+                <el-table-column  label="姓名" >
+                  <template slot-scope="scope">{{ scope.row.name }}</template>
+                </el-table-column>
                 <el-table-column prop="org" label="机构"></el-table-column>
                 <el-table-column prop="Email" label="邮箱"></el-table-column>
               </el-table>
@@ -71,6 +73,8 @@
             <div v-else class="none">无符合此条件学者</div>
           </div>
         </div>
+      </div>
+      <div class="home-body row MT_50" v-if="searchShow">
         <div class="home-body-relation">
           <el-divider content-position="left">合作路径</el-divider>
           <div class="PL_50 PR_50">
@@ -81,7 +85,7 @@
               </div>
             </div>
             <div class="row relation-echart" v-if="haveData">
-              <el-table :data="tableData2" border style="width: 100%">
+              <el-table :data="tableData2" border style="width: 100%" :row-class-name="tableRowClassName">
                 <el-table-column prop="name" label="姓名"></el-table-column>
                 <el-table-column prop="org" label="机构"></el-table-column>
                 <el-table-column prop="Email" label="邮箱"></el-table-column>
@@ -95,7 +99,28 @@
             <div v-else class="none">无符合此条件学者</div>
           </div>
         </div>
+          <div class="home-body-relation">
+            <el-divider content-position="left">合作路径</el-divider>
+            <div class="PL_50 PR_50">
+              <div class="relation-top row">
+                <div>
+                  <span>展示路径：{{showPath}}同事的中国论文合作者</span>
+                  <p>注：同领域的范围定为同期刊发文学者</p>
+                </div>
+              </div>
+              <div class="row relation-echart" v-if="haveData" >
+                <el-table :data="tableData5" border style="width: 100%" :row-class-name="tableRowClassName">
+                  <el-table-column prop="name" label="姓名"></el-table-column>
+                  <el-table-column prop="org" label="机构"></el-table-column>
+                  <el-table-column prop="Email" label="邮箱"></el-table-column>
+                </el-table>
+              </div>
+              <div v-else class="none">无符合此条件学者</div>
+            </div>
+          </div>
 
+      </div>
+      <div class="home-body row MT_50" v-if="searchShow">
         <div class="home-body-relation">
           <el-divider content-position="left">合作路径</el-divider>
           <div class="PL_50 PR_50">
@@ -105,7 +130,7 @@
               </div>
             </div>
             <div class="row relation-echart" v-if="haveData">
-              <el-table :data="tableData3" border style="width: 100%">
+              <el-table :data="tableData3" border style="width: 100%" :row-class-name="tableRowClassName">
                 <el-table-column prop="name" label="姓名"></el-table-column>
                 <el-table-column prop="org" label="机构"></el-table-column>
                 <el-table-column prop="Email" label="邮箱"></el-table-column>
@@ -115,30 +140,9 @@
           </div>
         </div>
       </div>
-      <i class="el-icon-bottom" v-if="searchShow"></i>
-
-      <div class="home-body row MT_50" v-if="searchShow">
-        <div class="home-body-relation" style="margin-left:33%">
-          <el-divider content-position="left">合作路径</el-divider>
-          <div class="PL_50 PR_50">
-            <div class="relation-top row">
-              <div>
-                <span>展示路径：{{showPath}}同事的中国论文合作者</span>
-                <p>注：同领域的范围定为同期刊发文学者</p>
-              </div>
-            </div>
-            <div class="row relation-echart" v-if="haveData">
-              <el-table :data="tableData5" border style="width: 100%">
-                <el-table-column prop="name" label="姓名"></el-table-column>
-                <el-table-column prop="org" label="机构"></el-table-column>
-                <el-table-column prop="Email" label="邮箱"></el-table-column>
-              </el-table>
-            </div>
-            <div v-else class="none">无符合此条件学者</div>
-          </div>
-        </div>
-      </div>
+      <!-- <i class="el-icon-bottom" v-if="searchShow"></i> -->
     </div>
+
     <el-dialog title="查询" :visible.sync="dialogVisible" width="60%" :before-close="handleClose">
       <el-table :data="tableData4" border style="width: 100%">
         <el-table-column prop="oData.Name" label="姓名"></el-table-column>
@@ -164,8 +168,8 @@ export default {
   data () {
     return {
       searchShow: false, // 是否第一次查询
-      name: '', // 姓名
-      org: '', // 机构
+      name: 'zhuang,yueting', // 姓名
+      org: 'zhejiang univ', // 机构
       showPath: '', // 路径
       figureData1: {}, // 图表数据
       figureData2: {}, // 图表数据
@@ -176,6 +180,7 @@ export default {
       tableData3: [],
       tableData4: [],
       tableData5: [],
+      i: 0,
       dialogVisible: false,
       loading: false // 加载判断
     }
@@ -311,19 +316,32 @@ export default {
                   draggable: true
                 })
               }
-              console.log(that.tableData1)
-
               that.tableData1.push({
+                texttype: item.texttype,
                 Email: item.oData.Email,
                 name: item.oData.Name,
                 org: item.oData.Organization
               })
             })
+            let time = setInterval(() => {
+              that.i++
+              that.tableData1.push({
+                texttype: 'zju',
+                Email: '123',
+                name: '123',
+                org: '123'
+              })
+              if (that.i === 5) {
+                clearInterval(time)
+              }
+            }, 1000)
+
             that.figureData1 = Object.assign({}, that.figureData1, {
               nodes: nodes,
               lines: lines
             })
           }
+
           if (type === 6) {
             let nodes = []
             let lines = []
@@ -369,6 +387,7 @@ export default {
                 })
               }
               that.tableData2.push({
+                texttype: item.texttype,
                 Email: item.oData.Email,
                 name: item.oData.Name,
                 org: item.oData.Organization
@@ -376,6 +395,7 @@ export default {
             })
             that.tableData5 = res.coauthorsdata.map(it => {
               return {
+                texttype: it.texttype,
                 Email: it.oData.Email,
                 name: it.oData.Name,
                 org: it.oData.Organization
@@ -431,6 +451,7 @@ export default {
                 })
               }
               that.tableData3.push({
+                texttype: item.texttype,
                 Email: item.oData.Email,
                 name: item.oData.Name,
                 org: item.oData.Organization
@@ -484,17 +505,25 @@ export default {
         success: function (res) {
           that.dialogVisible = true
           that.tableData4 = res.data
-          console.log(that.tableData4[0].oData)
-
           that.loading = false
         }
       })
     },
     handleClose () {
       this.dialogVisible = false
+    },
+    tableRowClassName ({row, rowIndex}) {
+      if (row.texttype === 'zju') {
+        return 'row-red'
+      } else if (row.texttype === 'chinese') {
+        return 'row-highlighted'
+      }
+      return ''
     }
   },
-  mounted () {},
+  mounted () {
+    this.search()
+  },
   watch: {}
 }
 </script>
@@ -601,8 +630,14 @@ export default {
       }
       .relation-echart {
         justify-content: space-between;
+        padding-bottom: 20px;
+        .row-red{
+          color: red;
+        }.row-highlighted{
+          background: #F8F8FF;
+        }
       }
-      .none{
+      .none {
         margin-top: 50px;
         text-align: center;
       }
