@@ -133,6 +133,7 @@ export default {
         }
         yAxisData.push(temp)
       })
+
       this.chart.setOption({
         title: {
           text: this.tit ? this.tit : '',
