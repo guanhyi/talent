@@ -7,6 +7,7 @@
       <div class="home-body row MT_50">
         <tableTem :tableData="tableData1" class="tableTem" lable="的同领域学者" :showPath="showPath"></tableTem>
         <tableTem
+          v-if="tableData2.length"
           :tableData="tableData2"
           class="tableTem"
           lable="的同领域学者的合作者"
@@ -109,12 +110,19 @@ export default {
               })
             }
           })
-          that.secondSearch(that.list[0], 0, 0, 0)
+          if (that.list.length) {
+            that.secondSearch(that.list[0], 0, 0, 0)
+          } else {
+            that.loading = false
+          }
         }
       })
     },
 
     secondSearch (data, time, startTime, type) {
+      if (!data) {
+        return
+      }
       this.isLoad = true
       let list = []
       let that = this
@@ -130,11 +138,14 @@ export default {
           p0: this.p1
         },
         start_time: new Date().getTime(),
-
         dataType: 'json',
         success: function (res) {
           if (!res.data.length) {
             that.num++
+            if (that.num === that.list.length) {
+              that.setList()
+              that.moreData()
+            }
             that.secondSearch(that.list[that.num], time - (new Date().getTime() - startTime), new Date().getTime(), type)
             return
           }
@@ -173,9 +184,7 @@ export default {
     mergeData (list) {
       this.num++
       let i = 0
-      if (this.num === 1) {
-        this.loading = false
-      }
+      this.loading = false
       this.isLoad = false
       this.times = setInterval(() => {
         this.tableData2.push(list[i])
@@ -185,16 +194,7 @@ export default {
         }
         if (i === list.length) {
           if (this.list.length === this.num) {
-            this.list = []
-            this.locData.forEach((item, index) => {
-              if (item.texttype !== 'zju') {
-                this.list.push({
-                  path: item.path,
-                  name: item.name,
-                  org: item.org
-                })
-              }
-            })
+            this.setList()
             this.moreData()
           }
           clearInterval(this.times)
@@ -205,9 +205,7 @@ export default {
       this.num++
       let i = 0
       this.isLoad = false
-      if (this.num === 1) {
-        this.loading = false
-      }
+      this.loading = false
       this.times = setInterval(() => {
         this.tableData3.push(list[i])
         i++
@@ -216,16 +214,7 @@ export default {
         }
         if (i === list.length) {
           if (!this.moreIndex && this.list.length === this.num) {
-            this.list = []
-            this.locData.forEach((item, index) => {
-              if (item.texttype !== 'zju') {
-                this.list.push({
-                  path: item.path,
-                  name: item.name,
-                  org: item.org
-                })
-              }
-            })
+            this.setList()
             this.isMore = true
             this.moreIndex++
           }
@@ -234,11 +223,28 @@ export default {
       }, 500)
     },
     moreData () {
+      console.log(1)
       this.loading = true
       this.isMore = false
       this.num = 0
       this.locData = []
+      if (!this.list.length) {
+        this.loading = false
+        return
+      }
       this.secondSearch(this.list[0], 0, 0, 1)
+    },
+    setList () {
+      this.list = []
+      this.locData.forEach((item, index) => {
+        if (item.texttype !== 'zju') {
+          this.list.push({
+            path: item.path,
+            name: item.name,
+            org: item.org
+          })
+        }
+      })
     },
 
     // 组装数据

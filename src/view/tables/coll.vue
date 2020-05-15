@@ -134,8 +134,13 @@ export default {
               })
             }
           })
-          that.loading = false
-          that.secondSearch(that.list[0], 0, 0)
+          console.log(that.list)
+
+          if (that.list.length) {
+            that.secondSearch(that.list[0], 0, 0, 0)
+          } else {
+            that.loading = false
+          }
         }
       })
     },
@@ -159,8 +164,14 @@ export default {
 
         dataType: 'json',
         success: function (res) {
+          if (!this.num) {
+            that.loading = false
+          }
           if (!res.data.length) {
             that.num++
+            if (that.num === that.list.length) {
+              return
+            }
             that.secondSearch(that.list[that.num], time - (new Date().getTime() - startTime), new Date().getTime())
             return
           }
@@ -195,9 +206,6 @@ export default {
     mergeData (list) {
       this.num++
       let i = 0
-      if (this.num === 1) {
-        this.loading = false
-      }
       this.isLoad = false
       this.times = setInterval(() => {
         this.tableData3.push(list[i])
@@ -257,6 +265,18 @@ export default {
     //
     handleClose () {
       this.dialogVisible = false
+    },
+    setList () {
+      this.list = []
+      this.locData.forEach((item, index) => {
+        if (item.texttype !== 'zju') {
+          this.list.push({
+            path: item.path,
+            name: item.name,
+            org: item.org
+          })
+        }
+      })
     },
     // 组装数据
     assemblyData (name, org) {
