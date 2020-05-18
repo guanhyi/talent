@@ -5,7 +5,7 @@
       <div class="PL_50 PR_50">
         <div class="relation-top row">
           <div>
-            <span>展示路径：{{showPath}}{{lable}}</span>
+            <!-- <span>展示路径：{{showPath}}{{lable}}</span> -->
           </div>
         </div>
         <div class="row relation-echart" v-if="tableData.length">
@@ -16,55 +16,37 @@
             :span-method="arraySpanMethod"
             :row-class-name="tableRowClassName"
           >
-            <el-table-column label="姓名">
-              <template slot-scope="scope" >
+            <el-table-column label="姓名" align="center">
+              <template slot-scope="scope">
+                <el-button type="primary" v-if="scope.row.more" @click="moreData(scope.row)">加载更多</el-button>
+                <el-tooltip
+                  v-else-if="tip"
+                  class="item"
+                  effect="dark"
+                  :content="scope.row.linkinfo"
+                  placement="top-start"
+                >
+                  <span>{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
+                </el-tooltip>
+                  <!-- <el-button type="primary" v-else-if="scope.$index === paparSize" @click="moreData">加载更多</el-button> -->
+                <span v-else>{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="机构" align="center">
+              <template slot-scope="scope" v-if="!scope.row.isPath && !scope.row.more">
                 <el-tooltip
                   v-if="tip"
                   class="item"
                   effect="dark"
-                  :content="tip?scope.row.path:''"
+                  :content="scope.row.linkinfo"
                   placement="top-start"
                 >
-                  <span>{{scope.row.isPath?scope.row.path:scope.row.name}}</span>
+                  <span>{{scope.row.oData.Organization}}</span>
                 </el-tooltip>
-                <span v-else >{{scope.row.isPath?scope.row.path:scope.row.name}}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="机构">
-              <template slot-scope="scope" v-if="!scope.row.isPath" >
-                <el-tooltip
-                v-if="tip"
-                  class="item"
-                  effect="dark"
-                  :content="scope.row.path"
-                  placement="top-start"
-                >
-                  <span >{{scope.row.org}}</span>
-                </el-tooltip>
-                      <span v-else >{{scope.row.org}}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="邮箱">
-              <template slot-scope="scope"  v-if="!scope.row.isPath">
-                <el-tooltip
-                v-if="tip"
-                  class="item"
-                  effect="dark"
-                  :content="scope.row.path"
-                  placement="top-start"
-                >
-                  <span>{{scope.row.Email}}</span>
-                </el-tooltip>
-                <span v-else >{{scope.row.Email}}</span>
-              </template>
-            </el-table-column>
-            <el-table-column fixed="right" label="操作" v-if="serach">
-              <template slot-scope="scope">
-                <el-button type="primary" size="mini" @click="query(scope.row)">查询</el-button>
+                <span v-else>{{scope.row.oData.Organization}}</span>
               </template>
             </el-table-column>
           </el-table>
-          <el-button type="primary" v-if="more" @click="moreData">加载更多</el-button>
         </div>
         <div v-else class="none">无符合此条件学者</div>
       </div>
@@ -80,35 +62,29 @@ export default {
       type: Array,
       required: true
     },
-    serach: {
-      type: Boolean,
-      default: false
-    },
-    haveData: {
-      type: Boolean,
-      default: false
-    },
-    more: {
-      type: Boolean,
-      default: false
+    index: {
+      type: String
     },
     showPath: {
       type: String
     },
     tip: {
       type: Boolean,
-      default: true
+      default: false
     },
     lable: {
       type: String
     }
   },
   watch: {
-
+    tableData: {
+      deep: true,
+      handler () {
+      }
+    }
   },
   data () {
     return {
-
     }
   },
   methods: {
@@ -124,22 +100,26 @@ export default {
       return ''
     },
     arraySpanMethod ({ row, column, rowIndex, columnIndex }) {
-      if (row.isPath) {
+      if (row.isPath || row.more) {
         return {
           rowspan: 1,
-          colspan: 3
+          colspan: 2
         }
       }
     },
     query (data) {
       this.$emit('query', data)
     },
-    moreData () {
-      this.$emit('moreData', this.lable)
+    moreData (row) {
+      let data = {
+        index: this.index,
+        type: row.type,
+        size: row.size
+      }
+      this.$emit('moreData', data)
     }
   },
   mounted () {
-
   }
 }
 </script>
@@ -183,16 +163,19 @@ export default {
     .row-highlighted {
       background: #f8f8ff;
     }
-    .row-path{
-      background: #CD00CD;
+    .row-path {
+      background: #cd00cd;
       color: white;
     }
-    .row-path:hover > td{
-      background: #CD00CD!important;
-      color: white!important;
+    .row-path:hover > td {
+      background: #cd00cd !important;
+      color: white !important;
     }
-    .el-buttom{
-      margin-top: 20px;
+    .el-button {
+      width: 90%;
+    }
+    .el-table td, .el-table th{
+      padding: 8px 0!important;
     }
   }
   .none {

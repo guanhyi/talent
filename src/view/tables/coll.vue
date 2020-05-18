@@ -134,8 +134,6 @@ export default {
               })
             }
           })
-          console.log(that.list)
-
           if (that.list.length) {
             that.secondSearch(that.list[0], 0, 0, 0)
           } else {

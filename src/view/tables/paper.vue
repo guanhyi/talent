@@ -85,7 +85,8 @@ export default {
       let temp = {
         cn: -1,
         type: '5',
-        p1: this.p1
+        p1: this.p1,
+        l: 1
       }
       this.getData(temp)
     },
