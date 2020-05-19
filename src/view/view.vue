@@ -39,7 +39,7 @@
           @moreData="moreData"
           lable="论文合作学者"
         ></tableTem>
-        <!-- <tableTem
+        <tableTem
           index="3"
           :tableData="tableData3"
           :tip="tip"
@@ -47,7 +47,7 @@
           class="tableTem"
           :showPath="showPath"
           lable="论文合作学者"
-        ></tableTem>-->
+        ></tableTem>
       </div>
     </div>
   </div>
@@ -74,12 +74,20 @@ export default {
       checked: false, // 模糊匹配
       p1: '',
       id: '',
+      pages: [
+        {page: 1},
+        {page: 1},
+        {page: 1}
+      ],
       paparData: {},
       collData: {},
       fieldData: {},
       tableData1: [],
+      locData1: [],
       tableData2: [],
+      locData2: [],
       tableData3: [],
+      locData3: [],
       figureData: {}
     }
   },
@@ -96,7 +104,6 @@ export default {
       }
       this.loading = true
       this.searchShow = true
-
       this.tableData1 = []
       this.tableData2 = []
       this.tableData3 = []
@@ -132,64 +139,18 @@ export default {
     getTableData1 () {
       this.paparData[0] = this.getData({
         type: 15,
-        ids: [{ id: this.id, link: this.name }]
+        ids: [{ id: this.id, link: this.name }],
+        l: 1,
+        p0: this.id
       })
-
       this.collData[0] = this.getData({
         type: 6,
         p1: this.p1
       })
-
       this.fieldData[0] = this.getData({
         type: 7,
         p1: this.p1
       })
-      // let paparTitle = {
-      //   title: '论文合作者',
-      //   isPath: true,
-      //   linkinfo: '论文合作者'
-      // }
-      // let collTitle = {
-      //   title: '同事',
-      //   isPath: true,
-      //   linkinfo: '同事'
-      // }
-      // let fieldTitle = {
-      //   title: '同领域中国学者',
-      //   isPath: true,
-      //   linkinfo: '同领域中国学者'
-      // }
-      let papar = []
-      papar = papar.concat(
-        this.paparData[0].zjudata,
-        this.paparData[0].chinadata,
-        this.paparData[0].autodata
-      )
-      let paparMore = []
-      // if (papar.length > 30) {
-      //   paparMore = {
-      //     more: true,
-      //     type: 'papar',
-      //     size: 30
-      //   }
-      // }
-      let collMore = []
-      // if (this.collData[0].data.length > 30) {
-      //   collMore = {
-      //     more: true,
-      //     type: 'coll',
-      //     size: 30
-      //   }
-      // }
-      let fieldMore = []
-      // if (this.fieldData[0].data.length > 30) {
-      //   fieldMore = {
-      //     more: true,
-      //     type: 'field',
-      //     size: 30
-      //   }
-      // }
-
       let zjudata = []
       let chinadata = []
       let autodata = []
@@ -212,287 +173,215 @@ export default {
         }
       })
       this.tableData1 = this.tableData1.concat(
-        // paparTitle,
-        // papar.slice(0, 30),
         this.paparData[0].zjudata,
         zjudata,
         this.paparData[0].chinadata,
         chinadata,
         this.paparData[0].autodata,
         autodata
-        // paparMore,
-        // // collTitle,
-        // this.collData[0].data,
-        // // this.collData[0].data.slice(0, 30),
-        // collMore,
-        // // fieldTitle,
-        // this.fieldData[0].data,
-        // // this.fieldData[0].data.slice(0, 30),
-        // fieldMore
       )
-      this.getTableData2()
+      this.locData1 = this.locData1.concat(
+        this.paparData[0].zjudata,
+        zjudata,
+        this.paparData[0].chinadata,
+        chinadata,
+        this.paparData[0].autodata,
+        autodata
+      )
+      if (this.tableData1.length > 50) {
+        this.tableData1 = this.tableData1.slice(0, 50)
+        this.tableData1.push({
+          more: true,
+          type: 'papar'
+        })
+      }
+      if (this.tableData1.length) {
+        this.getTableData2()
+      } else {
+        this.loading = false
+      }
     },
     getTableData2 () {
       let paparData = []
-      paparData = paparData.concat(
-        this.paparData[0].zjudata,
-        this.paparData[0].chinadata,
-        this.paparData[0].autodata
+      if (this.paparData[0]) {
+        paparData = paparData.concat(
+          this.paparData[0].zjudata,
+          this.paparData[0].chinadata,
+          this.paparData[0].autodata
+        )
+        if (paparData.length) {
+          let paparIds = paparData.map(it => {
+            return {
+              id: it.oData.Id,
+              link: it.linkinfo
+            }
+          })
+          this.paparData[1] = this.getData({
+            type: 15,
+            ids: paparIds,
+            l: 2,
+            p0: this.id
+          })
+        }
+      }
+      if (this.fieldData[0]) {
+        let fieldIds = this.fieldData[0].data.map(it => {
+          return {
+            id: it.oData.Id,
+            link: this.name + '-----' + it.oData.Name
+          }
+        })
+        this.fieldData[1] = this.getData({
+          type: 15,
+          ids: fieldIds,
+          l: 2,
+          p0: this.id
+        })
+      }
+      if (this.collData[0]) {
+        let collIds = this.collData[0].data.map(it => {
+          return {
+            id: it.oData.Id,
+            link: this.name + '-----' + it.oData.Name
+          }
+        })
+        this.collData[1] = this.getData({
+          type: 15,
+          ids: collIds,
+          l: 2,
+          p0: this.id
+        })
+      }
+      this.locData2 = this.locData2.concat(
+        this.paparData[1].zjudata,
+        this.collData[1].zjudata,
+        this.fieldData[1].zjudata,
+        this.paparData[1].chinadata,
+        this.collData[1].chinadata,
+        this.fieldData[1].chinadata,
+        this.paparData[1].autodata,
+        this.collData[1].autodata,
+        this.fieldData[1].autodata
       )
-      let paparIds = paparData.map(it => {
-        return {
-          id: it.oData.Id,
-          link: it.linkinfo
-        }
-      })
-      this.paparData[1] = this.getData({
-        type: 15,
-        ids: paparIds
-      })
-
-      let fieldIds = this.fieldData[0].data.map(it => {
-        return {
-          id: it.oData.Id,
-          link: this.name + '-----' + it.oData.Name
-        }
-      })
-      this.fieldData[1] = this.getData({
-        type: 15,
-        ids: fieldIds
-      })
-      // let paparTitle = {
-      //   title: '论文合作者的论文合作者',
-      //   isPath: true,
-      //   linkinfo: '论文合作者的论文合作者'
-      // }
-      // let collTitle = {
-      //   title: '同事的论文合作者',
-      //   isPath: true,
-      //   linkinfo: '同事的论文合作者'
-      // }
-      this.collData[0].coauthorsdata.forEach((item, index) => {
-        this.collData[0].coauthorsdata[index].linkinfo =
-          this.name + '-----' + item.oData.Name
-      })
-      // let fieldTitle = {
-      //   title: '同领域中国学者的论文合作者',
-      //   isPath: true,
-      //   linkinfo: '同领域中国学者的论文合作者'
-      // }
-      // let papar = []
-      // let field = []
-      // papar = papar.concat(
-      //   this.paparData[1].zjudata,
-      //   this.paparData[1].chinadata,
-      //   this.paparData[1].autodata
-      // )
-      // field = field.concat(
-      //   this.fieldData[1].zjudata,
-      //   this.fieldData[1].chinadata,
-      //   this.fieldData[1].autodata
-      // )
-
-      // let paparMore = []
-      // // if (papar.length > 30) {
-      // //   paparMore = {
-      // //     more: true,
-      // //     type: 'papar',
-      // //     size: 30
-      // //   }
-      // // }
-      // let collMore = []
-      // // if (this.collData[0].coauthorsdata.length > 30) {
-      // //   collMore = {
-      // //     more: true,
-      // //     type: 'coll',
-      // //     size: 30
-      // //   }
-      // // }
-      // let fieldMore = []
-      // // if (field.length > 30) {
-      // //   fieldMore = {
-      // //     more: true,
-      // //     type: 'field',
-      // //     size: 30
-      // //   }
-      // // }
-      // this.tableData2 = this.tableData2.concat(
-      //   // paparTitle,
-      //   // papar.slice(0, 30),
-      //   papar,
-      //   paparMore,
-      //   // collTitle,
-      //   this.collData[0].coauthorsdata,
-      //   // this.collData[0].coauthorsdata.slice(0, 30),
-      //   collMore,
-      //   // fieldTitle,
-      //   field,
-      //   // field.slice(0, 30),
-      //   fieldMore
-      // )
-      this.getTableData3()
+      if (this.locData2.length > 50) {
+        this.tableData2 = this.locData2.slice(0, 50)
+        this.tableData2.push({
+          more: true,
+          type: 'papar'
+        })
+      } else {
+        this.tableData2 = this.locData2
+      }
+      if (this.tableData2.length) {
+        this.getTableData3()
+      } else {
+        this.loading = false
+      }
     },
     getTableData3 () {
       let paparData = []
-      paparData = paparData.concat(
-        this.paparData[1].zjudata,
-        this.paparData[1].chinadata,
-        this.paparData[1].autodata
-      )
-      let paparIds = paparData.map(it => {
-        return {
-          id: it.oData.Id,
-          link: it.linkinfo
+      let collData = []
+      if (this.paparData[1]) {
+        paparData = paparData.concat(
+          this.paparData[1].zjudata,
+          this.paparData[1].chinadata,
+          this.paparData[1].autodata
+        )
+        if (paparData) {
+          let paparIds = paparData.map(it => {
+            return {
+              id: it.oData.Id,
+              link: it.linkinfo
+            }
+          })
+          this.paparData[2] = this.getData({
+            type: 15,
+            ids: paparIds,
+            l: 2,
+            p0: this.id
+          })
         }
-      })
-      this.paparData[2] = this.getData({
-        type: 15,
-        ids: paparIds
-      })
-
-      let collIds = this.collData[0].coauthorsdata.map(it => {
-        return {
-          id: it.oData.Id,
-          link: this.name + '-----' + it.oData.Name
+      }
+      if (this.collData[1]) {
+        collData = collData.concat(
+          this.collData[1].zjudata,
+          this.collData[1].chinadata,
+          this.collData[1].autodata
+        )
+        if (collData.length) {
+          let collIds = collData.map(it => {
+            return {
+              id: it.oData.Id,
+              link: this.name + '-----' + it.oData.Name
+            }
+          })
+          this.collData[2] = this.getData({
+            type: 15,
+            ids: collIds,
+            l: 2,
+            p0: this.id
+          })
         }
-      })
-      this.collData[1] = this.getData({
-        type: 15,
-        ids: collIds
-      })
-      // let paparTitle = {
-      //   title: '论文合作者的论文合作者的论文合作者',
-      //   isPath: true,
-      //   linkinfo: '论文合作者的论文合作者的论文合作者'
-      // }
-      // let collTitle = {
-      //   title: '同事的论文合作者的论文合作者',
-      //   isPath: true,
-      //   linkinfo: '同事的论文合作者的论文合作者'
-      // }
-      // let papar = []
-      // let coll = []
-      // papar = papar.concat(
-      //   this.paparData[2].zjudata,
-      //   this.paparData[2].chinadata,
-      //   this.paparData[2].autodata
-      // )
-      // coll = coll.concat(
-      //   this.collData[1].zjudata,
-      //   this.collData[1].chinadata,
-      //   this.collData[1].autodata
-      // )
-      // let paparMore = []
-      // let collMore = []
-
-      // if (papar.length > 30) {
-      //   paparMore = {
-      //     more: true,
-      //     type: 'papar',
-      //     size: 30
-      //   }
-      // }
-      // if (coll.length > 30) {
-      //   collMore = {
-      //     more: true,
-      //     type: 'coll',
-      //     size: 30
-      //   }
-      // }
-      let zjudata = []
-      let chinadata = []
-      let autodata = []
-      this.collData[0].coauthorsdata.forEach((item, index) => {
-        if (item.texttype === 'zju') {
-          zjudata.push(item)
-        } else if (item.texttype === 'auto') {
-          autodata.push(item)
-        } else if (item.texttype === 'chinese') {
-          chinadata.push(item)
-        }
-      })
-
-      this.tableData2 = this.tableData2.concat(
-        this.paparData[1].zjudata,
-        zjudata,
-        this.fieldData[1].zjudata,
+      }
+      this.locData3 = this.locData3.concat(
         this.paparData[2].zjudata,
-        this.collData[1].zjudata,
-
-        this.paparData[1].chinadata,
-        chinadata,
-        this.fieldData[1].chinadata,
+        this.collData[2].zjudata,
         this.paparData[2].chinadata,
-        this.collData[1].chinadata,
-
-        this.paparData[1].autodata,
-        autodata,
-        this.fieldData[1].autodata,
+        this.collData[2].chinadata,
         this.paparData[2].autodata,
-        this.collData[1].autodata
-        //   this.paparData[2].chinadata,
-        //   this.paparData[2].autodata
-        // paparTitle,
-        // papar.slice(0, 30),
-        // papar,
-        // paparMore,
-        // // collTitle,
-        // coll,
-        // // coll.slice(0, 30),
-        // collMore
+        this.collData[2].autodata
       )
+
+      if (this.locData3.length > 50) {
+        this.tableData3 = this.locData3.slice(0, 50)
+        this.tableData3.push({
+          more: true,
+          type: 'papar'
+        })
+      } else {
+        this.tableData3 = this.locData3
+      }
       this.loading = false
     },
     moreData (data) {
       if (data.index === '1') {
+        this.pages[0].page++
+        this.addTableData1()
       } else if (data.index === '2') {
-        this.tableData2 = []
+        this.pages[1].page++
+        this.addTableData2()
       } else if (data.index === '3') {
+        this.pages[2].page++
+        this.addTableData3()
       }
     },
-    // addTableData1 () {
-    //   let papar = []
-    //   papar = papar.concat(
-    //     this.paparData[0].zjudata,
-    //     this.paparData[0].chinadata,
-    //     this.paparData[0].autodata
-    //   )
-    //   let paparMore = []
-    //   if (papar.length > 30) {
-    //     paparMore = {
-    //       more: true,
-    //       type: 'papar',
-    //       size: 30
-    //     }
-    //   }
-    //   let collMore = []
-    //   if (this.collData[0].data.length > 30) {
-    //     collMore = {
-    //       more: true,
-    //       type: 'coll',
-    //       size: 30
-    //     }
-    //   }
-    //   let fieldMore = []
-    //   if (this.fieldData[0].data.length > 30) {
-    //     fieldMore = {
-    //       more: true,
-    //       type: 'field',
-    //       size: 30
-    //     }
-    //   }
-    //   this.tableData1 = this.tableData1.concat(
-    //     paparTitle,
-    //     papar.slice(0, 30),
-    //     paparMore,
-    //     collTitle,
-    //     this.collData[0].data.slice(0, 30),
-    //     collMore,
-    //     fieldTitle,
-    //     this.fieldData[0].data.slice(0, 30),
-    //     fieldMore
-    //   )
-    // },
+    addTableData1 () {
+      this.tableData1 = this.locData1.slice(0, 50 * this.pages[0].page)
+      if (this.locData1.length > 50 * this.pages[0].page) {
+        this.tableData1.push({
+          more: true,
+          type: 'papar'
+        })
+      }
+    },
+    addTableData2 () {
+      this.tableData2 = this.locData2.slice(0, 50 * this.pages[1].page)
+      if (this.locData2.length > 50 * this.pages[1].page) {
+        this.tableData2.push({
+          more: true,
+          type: 'papar'
+        })
+      }
+    },
+    addTableData3 () {
+      this.tableData3 = this.locData3.slice(0, 50 * this.pages[2].page)
+      if (this.locData3.length > 50 * this.pages[2].page) {
+        this.tableData3.push({
+          more: true,
+          type: 'papar'
+        })
+      }
+    },
     handleClick () {}
   },
   mounted () {

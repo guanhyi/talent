@@ -113,8 +113,7 @@ export default {
     moreData (row) {
       let data = {
         index: this.index,
-        type: row.type,
-        size: row.size
+        type: row.type
       }
       this.$emit('moreData', data)
     }
