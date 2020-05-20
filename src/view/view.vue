@@ -5,9 +5,22 @@
         <el-divider content-position="left">学者合作路径查询</el-divider>
         <div class="home-header-search PR_20 PL_20">
           <span>查询人名</span>
-          <el-input class="ML_30" v-model="name" placeholder="必填"></el-input>
+          <el-autocomplete
+          class="ML_30"
+            v-model="name"
+            :fetch-suggestions="remoteMethodName"
+            placeholder="请输入内容"
+            @select="changeName"
+          ></el-autocomplete>
+          <!-- <el-input v-else class="ML_30" v-model="name" @input="isSelect = true"></el-input> -->
           <span class="ML_30">查询机构</span>
-          <el-input class="ML_30" v-model="org" placeholder="必填"></el-input>
+           <el-autocomplete
+           class="ML_30"
+            v-model="org"
+            :fetch-suggestions="remoteMethodOrg"
+            placeholder="请输入内容"
+            @select="changeOrg"
+          ></el-autocomplete>
           <el-button
             class="ML_30"
             type="primary"
@@ -15,13 +28,14 @@
             @click="search"
             :loading="loading"
           >搜索</el-button>
-          <el-checkbox v-model="checked" class="check ML_30">合作者限制为中国学者</el-checkbox>
+          <!-- <el-checkbox v-model="checked" class="check ML_30">合作者限制为中国学者</el-checkbox> -->
         </div>
       </div>
       <span>说明：</span>
       <p>同事：与查询学者在同机构且在同期刊上发文的学者</p>
       <p>同领域学者：与查询学者在同期刊上发文的学者</p>
-      <div class="home-body row MT_20" v-loading="loading" v-if="searchShow">
+      <p>展示时间受节点数量影响，二次跳转节点数量超过2000预计需耗时20秒，请您耐心等待</p>
+      <div class="home-body row MT_20" v-loading="loading1" v-if="searchShow">
         <tableTem
           :tableData="tableData1"
           class="tableTem"
@@ -31,6 +45,7 @@
           @moreData="moreData"
         ></tableTem>
         <tableTem
+          :loading="loading2"
           index="2"
           :tableData="tableData2"
           :tip="tip"
@@ -40,6 +55,7 @@
           lable="论文合作学者"
         ></tableTem>
         <tableTem
+          :loading="loading3"
           index="3"
           :tableData="tableData3"
           :tip="tip"
@@ -66,19 +82,22 @@ export default {
   data () {
     return {
       loading: false,
+      loading1: false,
+      loading2: false,
+      loading3: false,
       tip: true,
       searchShow: false, // 是否第一次查询
-      name: 'tao,yunzhe', // 姓名
-      org: 'columbia univ', // 机构
+      value: '',
+      name: this.$route.query.name || 'tao,yunzhe', // 姓名
+      org: this.$route.query.Organization || 'columbia univ', // 机构
       showPath: '', // 路径
       checked: false, // 模糊匹配
       p1: '',
       id: '',
-      pages: [
-        {page: 1},
-        {page: 1},
-        {page: 1}
-      ],
+      pages: [{ page: 1 }, { page: 1 }, { page: 1 }],
+      ids: [],
+      data2: [],
+      data3: [],
       paparData: {},
       collData: {},
       fieldData: {},
@@ -87,8 +106,7 @@ export default {
       tableData2: [],
       locData2: [],
       tableData3: [],
-      locData3: [],
-      figureData: {}
+      locData3: []
     }
   },
   methods: {
@@ -102,17 +120,28 @@ export default {
         this.$message('请输入查询机构')
         return
       }
-      this.loading = true
+      this.loading1 = true
       this.searchShow = true
       this.tableData1 = []
       this.tableData2 = []
+      this.ids = []
       this.tableData3 = []
+      this.locData2 = []
+      this.locData3 = []
+      this.locData1 = []
+      this.locData1 = []
+
       this.showPath = this.name + '(' + this.org + ')'
       let data = this.getData({
         type: 3,
         s_name: this.name,
         s_org: this.org
       })
+      if (!data.data.length) {
+        this.$message('未能搜索到结果！')
+        this.loading = false
+        return
+      }
       this.p1 =
         '#' + data.data[0].rid.cluster + ':' + data.data[0].rid.position
       this.id = data.data[0].oData.Id
@@ -120,6 +149,74 @@ export default {
         this.getTableData1()
       }, 1000)
     },
+    remoteMethodName (queryString, cb) {
+      if (queryString.length < 3) {
+        return
+      }
+      this.loading = true
+      let that = this
+      $.ajax({
+        type: 'post',
+        url: 'http://183.136.237.195/graph_namematch',
+        data: {
+          type: 1,
+          name: queryString
+        },
+        dataType: 'json',
+        async: false,
+        success: function (res) {
+          that.optionsName = res.data.map(it => {
+            return {
+              id: it.id,
+              name: it.name,
+              org: it.organization,
+              value: it.name + ' (' + it.organization + ')'
+            }
+          })
+          cb(that.optionsName)
+          that.loading = false
+        }
+      })
+    },
+    remoteMethodOrg (data, cb) {
+      if (data.length < 3) {
+        this.optionsName = []
+        return
+      }
+      this.loading = true
+      let that = this
+      $.ajax({
+        type: 'post',
+        url: 'http://183.136.237.195/graph_namematch',
+        data: {
+          type: 2,
+          name: this.name,
+          org: data
+        },
+        dataType: 'json',
+        async: false,
+        success: function (res) {
+          that.optionsOrg = res.data.map(it => {
+            return {
+              id: it.id,
+              name: it.name,
+              org: it.organization,
+              value: it.organization
+            }
+          })
+          cb(that.optionsOrg)
+          that.loading = false
+        }
+      })
+    },
+    changeName (query) {
+      this.name = query.name
+      this.org = query.org
+    },
+    changeOrg (query) {
+      this.org = query.org
+    },
+
     // 获取数据
     getData (data) {
       let temp
@@ -143,12 +240,31 @@ export default {
         l: 1,
         p0: this.id
       })
+      let papar = []
+      papar = papar.concat(
+        this.paparData[0].zjudata,
+        this.paparData[0].chinadata,
+        this.paparData[0].autodata
+      )
+      let Ids = papar.map(it => {
+        return {id: it.oData.Id}
+      })
       this.collData[0] = this.getData({
         type: 6,
-        p1: this.p1
+        p1: this.p1,
+        notin: Ids
+      })
+      this.collData[0].data.forEach((it) => {
+        Ids.push({
+          id: it.oData.Id
+        })
+      })
+      Ids.push({
+        id: this.id
       })
       this.fieldData[0] = this.getData({
         type: 7,
+        notin: Ids,
         p1: this.p1
       })
       let zjudata = []
@@ -188,6 +304,7 @@ export default {
         this.paparData[0].autodata,
         autodata
       )
+      this.accIds(this.locData1)
       if (this.tableData1.length > 50) {
         this.tableData1 = this.tableData1.slice(0, 50)
         this.tableData1.push({
@@ -195,14 +312,20 @@ export default {
           type: 'papar'
         })
       }
+      this.loading1 = false
+
       if (this.tableData1.length) {
-        this.getTableData2()
-      } else {
-        this.loading = false
+        this.loading2 = true
+        this.loading3 = true
+        setTimeout(() => {
+          this.getTableData2()
+        }, 500)
       }
     },
     getTableData2 () {
+      this.loading2 = true
       let paparData = []
+      let ids = []
       if (this.paparData[0]) {
         paparData = paparData.concat(
           this.paparData[0].zjudata,
@@ -210,59 +333,36 @@ export default {
           this.paparData[0].autodata
         )
         if (paparData.length) {
-          let paparIds = paparData.map(it => {
-            return {
+          paparData.forEach(it => {
+            ids.push({
               id: it.oData.Id,
               link: it.linkinfo
-            }
-          })
-          this.paparData[1] = this.getData({
-            type: 15,
-            ids: paparIds,
-            l: 2,
-            p0: this.id
+            })
           })
         }
       }
-      if (this.fieldData[0]) {
-        let fieldIds = this.fieldData[0].data.map(it => {
-          return {
-            id: it.oData.Id,
-            link: this.name + '-----' + it.oData.Name
-          }
-        })
-        this.fieldData[1] = this.getData({
-          type: 15,
-          ids: fieldIds,
-          l: 2,
-          p0: this.id
-        })
-      }
       if (this.collData[0]) {
-        let collIds = this.collData[0].data.map(it => {
-          return {
+        this.collData[0].data.forEach(it => {
+          ids.push({
             id: it.oData.Id,
             link: this.name + '-----' + it.oData.Name
-          }
-        })
-        this.collData[1] = this.getData({
-          type: 15,
-          ids: collIds,
-          l: 2,
-          p0: this.id
+          })
         })
       }
+
+      this.data2 = this.getData({
+        type: 15,
+        ids: ids,
+        l: 2,
+        notin: this.ids,
+        p0: this.id
+      })
       this.locData2 = this.locData2.concat(
-        this.paparData[1].zjudata,
-        this.collData[1].zjudata,
-        this.fieldData[1].zjudata,
-        this.paparData[1].chinadata,
-        this.collData[1].chinadata,
-        this.fieldData[1].chinadata,
-        this.paparData[1].autodata,
-        this.collData[1].autodata,
-        this.fieldData[1].autodata
+        this.data2.zjudata,
+        this.data2.chinadata,
+        this.data2.autodata
       )
+      this.accIds(this.locData2)
       if (this.locData2.length > 50) {
         this.tableData2 = this.locData2.slice(0, 50)
         this.tableData2.push({
@@ -272,64 +372,34 @@ export default {
       } else {
         this.tableData2 = this.locData2
       }
+      this.loading2 = false
+
       if (this.tableData2.length) {
         this.getTableData3()
       } else {
-        this.loading = false
+        this.loading3 = false
       }
     },
     getTableData3 () {
-      let paparData = []
-      let collData = []
-      if (this.paparData[1]) {
-        paparData = paparData.concat(
-          this.paparData[1].zjudata,
-          this.paparData[1].chinadata,
-          this.paparData[1].autodata
-        )
-        if (paparData) {
-          let paparIds = paparData.map(it => {
-            return {
-              id: it.oData.Id,
-              link: it.linkinfo
-            }
-          })
-          this.paparData[2] = this.getData({
-            type: 15,
-            ids: paparIds,
-            l: 2,
-            p0: this.id
-          })
-        }
-      }
-      if (this.collData[1]) {
-        collData = collData.concat(
-          this.collData[1].zjudata,
-          this.collData[1].chinadata,
-          this.collData[1].autodata
-        )
-        if (collData.length) {
-          let collIds = collData.map(it => {
-            return {
-              id: it.oData.Id,
-              link: this.name + '-----' + it.oData.Name
-            }
-          })
-          this.collData[2] = this.getData({
-            type: 15,
-            ids: collIds,
-            l: 2,
-            p0: this.id
-          })
-        }
-      }
+      this.loading3 = true
+      let ids = []
+      this.locData2.forEach(it => {
+        ids.push({
+          id: it.oData.Id,
+          link: it.linkinfo
+        })
+      })
+      this.data3 = this.getData({
+        type: 15,
+        ids: ids,
+        l: 3,
+        notin: this.ids,
+        p0: this.id
+      })
       this.locData3 = this.locData3.concat(
-        this.paparData[2].zjudata,
-        this.collData[2].zjudata,
-        this.paparData[2].chinadata,
-        this.collData[2].chinadata,
-        this.paparData[2].autodata,
-        this.collData[2].autodata
+        this.data3.zjudata,
+        this.data3.chinadata,
+        this.data3.autodata
       )
 
       if (this.locData3.length > 50) {
@@ -341,7 +411,7 @@ export default {
       } else {
         this.tableData3 = this.locData3
       }
-      this.loading = false
+      this.loading3 = false
     },
     moreData (data) {
       if (data.index === '1') {
@@ -382,12 +452,19 @@ export default {
         })
       }
     },
+    accIds (data) {
+      data.forEach(it => {
+        this.ids.push({ id: it.oData.Id })
+      })
+    },
     handleClick () {}
   },
   mounted () {
     this.search()
   },
-  watch: {}
+  watch: {
+
+  }
 }
 </script>
 

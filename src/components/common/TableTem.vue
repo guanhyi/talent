@@ -1,5 +1,5 @@
 <template>
-  <div class="tableTem">
+  <div class="tableTem" >
     <div class="home-body-relation">
       <el-divider content-position="left">合作路径</el-divider>
       <div class="PL_50 PR_50">
@@ -10,6 +10,7 @@
         </div>
         <div class="row relation-echart" v-if="tableData.length">
           <el-table
+            @row-click='clickCell'
             :data="tableData"
             border
             style="width: 100%"
@@ -48,7 +49,7 @@
             </el-table-column>
           </el-table>
         </div>
-        <div v-else class="none">无符合此条件学者</div>
+        <div v-else class="none" v-loading="loading">无符合此条件学者</div>
       </div>
     </div>
   </div>
@@ -68,6 +69,10 @@ export default {
     showPath: {
       type: String
     },
+    loading: {
+      type: Boolean,
+      default: false
+    },
     tip: {
       type: Boolean,
       default: false
@@ -77,11 +82,7 @@ export default {
     }
   },
   watch: {
-    tableData: {
-      deep: true,
-      handler () {
-      }
-    }
+
   },
   data () {
     return {
@@ -116,6 +117,17 @@ export default {
         type: row.type
       }
       this.$emit('moreData', data)
+    },
+    clickCell (row, column, cell, event) {
+      if (!column || row.isPath) {
+        return
+      }
+
+      let routeData = this.$router.resolve({
+        name: 'view',
+        query: { name: row.oData.Name, Organization: row.oData.Organization }
+      })
+      window.open(routeData.href, '_blank')
     }
   },
   mounted () {
@@ -125,7 +137,7 @@ export default {
 
 <style lang="scss">
 .home-body-relation {
-  min-height: 200px;
+  min-height: 400px;
   width: 100%;
   border-left: 1px solid #dcdfe6;
   border-right: 1px solid #dcdfe6;
@@ -178,6 +190,7 @@ export default {
     }
   }
   .none {
+
     margin-top: 50px;
     text-align: center;
   }
