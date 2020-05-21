@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Header > </Header>
+    <Header></Header>
     <router-view />
   </div>
 </template>
@@ -17,6 +17,10 @@ export default {
     }
   },
   mounted () {
+    const s = document.createElement('script')
+    s.type = 'text/javascript'
+    s.src = '/static/js/leader-line.min.js'
+    document.body.appendChild(s)
     this.path = this.$route.path
   },
   watch: {

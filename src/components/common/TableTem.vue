@@ -1,5 +1,5 @@
 <template>
-  <div class="tableTem" >
+  <div class="tableTem">
     <div class="home-body-relation">
       <el-divider content-position="left">合作路径</el-divider>
       <div class="PL_50 PR_50">
@@ -10,7 +10,7 @@
         </div>
         <div class="row relation-echart" v-if="tableData.length">
           <el-table
-            @row-click='clickCell'
+            @row-click="clickCell"
             :data="tableData"
             border
             style="width: 100%"
@@ -27,10 +27,15 @@
                   :content="scope.row.linkinfo"
                   placement="top-start"
                 >
-                  <span>{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
+                  <span
+                    :id='"table"+index+scope.$index'
+                  >{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
                 </el-tooltip>
-                  <!-- <el-button type="primary" v-else-if="scope.$index === paparSize" @click="moreData">加载更多</el-button> -->
-                <span v-else>{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
+                <!-- <el-button type="primary" v-else-if="scope.$index === paparSize" @click="moreData">加载更多</el-button> -->
+                <span
+                  v-else
+                  :id='"table"+index+scope.$index'
+                >{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
               </template>
             </el-table-column>
             <el-table-column label="机构" align="center">
@@ -77,15 +82,31 @@ export default {
       type: Boolean,
       default: false
     },
-    lable: {
-      type: String
+
+    lines: {
+      type: Array
+    },
+    drawLine: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
-
+    lines: {
+      deep: true,
+      handler () {
+        if (this.lines.length) {
+          this.$nextTick(() => {
+            this.drwaLine(this.lines)
+          })
+        }
+      }
+    }
   },
   data () {
     return {
+      line1: [],
+      line2: []
     }
   },
   methods: {
@@ -116,6 +137,8 @@ export default {
         index: this.index,
         type: row.type
       }
+      // this.clearLine()
+
       this.$emit('moreData', data)
     },
     clickCell (row, column, cell, event) {
@@ -124,14 +147,99 @@ export default {
       }
 
       let routeData = this.$router.resolve({
-        name: 'view',
+        name: '/',
         query: { name: row.oData.Name, Organization: row.oData.Organization }
       })
       window.open(routeData.href, '_blank')
+    },
+    drwaLine (data) {
+      if (!data.length) {
+        return
+      }
+      // Leader line options
+      let options = {
+        color: '#5bf',
+        endPlug: 'disc',
+        size: 2,
+        startSocket: 'left',
+        endSocket: 'right',
+        hide: true
+      }
+      // Anchor styles
+      data.forEach((record, index) => {
+        var anchor = LeaderLine.mouseHoverAnchor(
+          document.getElementById(record.start),
+          'draw',
+          {
+            // 指引线动效
+            animOptions: {
+              duration: 500
+            },
+            // 清除默认的hover样式
+            hoverStyle: {
+              backgroundColor: null
+            },
+            style: {
+              paddingTop: null,
+              paddingRight: null,
+              paddingBottom: null,
+              paddingLeft: null,
+              cursor: null,
+              backgroundColor: null,
+              backgroundImage: null,
+              backgroundSize: null,
+              backgroundPosition: null,
+              backgroundRepeat: null
+            }
+            // 当起始点被hover时调用的事件
+            // onSwitch: function (event) {
+            //   var line = lines[record.start]
+            //   // 浮动上去就重绘
+            //   if (event.type === 'mouseenter') {
+            //   }
+            // }
+          }
+        )
+        if (this.index === '2') {
+          this.line1[record.start] = new LeaderLine(
+            anchor,
+            document.getElementById(record.end),
+            options
+          )
+        } else if (this.index === '3') {
+          this.line2[record.start] = new LeaderLine(
+            anchor,
+            document.getElementById(record.end),
+            options
+          )
+        }
+      })
     }
+    // clearLine () {
+    //   if (this.index === '2') {
+    //     this.line1.forEach((it, index) => {
+    //       this.line1[it].remove()
+    //     })
+    //   } else if (this.index === '3') {
+
+    //   }
+    // // },
+    // clearLine (data) {
+    //   if (this.index === '2') {
+    //     for (var key in this.line1) {
+    //       this.line1[key].remove()
+    //     }
+    //   } else if (this.index === '3') {
+    //     for (var key in this.line2) {
+    //       this.line2[key].remove()
+    //     }
+    //   }
+    //   this.line2 = []
+
+    //   console.log(this.line2)
+    // }
   },
-  mounted () {
-  }
+  mounted () {}
 }
 </script>
 
@@ -185,12 +293,12 @@ export default {
     .el-button {
       width: 90%;
     }
-    .el-table td, .el-table th{
-      padding: 8px 0!important;
+    .el-table td,
+    .el-table th {
+      padding: 8px 0 !important;
     }
   }
   .none {
-
     margin-top: 50px;
     text-align: center;
   }
