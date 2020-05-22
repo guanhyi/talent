@@ -19,7 +19,8 @@ export default {
   mounted () {
     const s = document.createElement('script')
     s.type = 'text/javascript'
-    s.src = '/static/js/leader-line.min.js'
+    s.src = '/expert/static/js/leader-line.min.js'
+    // s.src = '/static/js/leader-line.min.js'
     document.body.appendChild(s)
     this.path = this.$route.path
   },

@@ -358,11 +358,19 @@ export default {
       let paparTitle = [];
       let collTitle = [];
       let fieldTitle = [];
-      paparData = paparData.concat(
-        this.paparData[0].zjudata,
-        this.paparData[0].chinadata,
-        this.paparData[0].autodata
-      );
+      if (this.paparData[0].zjudata.length) {
+        paparData = paparData.concat(
+          this.paparData[0].chinadata,
+          this.paparData[0].autodata
+        );
+      } else {
+        paparData = paparData.concat(
+          this.paparData[0].zjudata,
+          this.paparData[0].chinadata,
+          this.paparData[0].autodata
+        );
+      }
+
       if (paparData.length) {
         let paparIds = paparData.map(it => {
           return {
@@ -436,10 +444,12 @@ export default {
 
       if (this.collData[0].data.length) {
         let collIds = this.collData[0].data.map(it => {
-          return {
-            id: it.oData.Id,
-            link: this.name + "-----" + it.oData.Name
-          };
+          if (it.texttype !== "zju") {
+            return {
+              id: it.oData.Id,
+              link: this.name + "-----" + it.oData.Name
+            };
+          }
         });
         this.collData[1] = this.getData({
           type: 15,
@@ -470,17 +480,17 @@ export default {
       }
       this.accIds(papar);
       this.accIds(coll);
-      this.accIds(field);
+      // this.accIds(field);
       this.tableData2 = this.tableData2.concat(
         paparTitle,
         papar.slice(0, 30),
         paparMore,
         collTitle,
         coll.slice(0, 30),
-        collMore,
-        fieldTitle,
-        field.slice(0, 30),
-        fieldMore
+        collMore
+        // fieldTitle,
+        // field.slice(0, 30),
+        // fieldMore
       );
       this.loading2 = false;
       if (this.tableData2.length) {
@@ -501,11 +511,18 @@ export default {
       let paparTitle = [];
       let collTitle = [];
       if (this.paparData[1]) {
-        paparData = paparData.concat(
-          this.paparData[1].zjudata,
-          this.paparData[1].chinadata,
-          this.paparData[1].autodata
-        );
+        if (this.paparData[1].zjudata.length) {
+          paparData = paparData.concat(
+            this.paparData[1].chinadata,
+            this.paparData[1].autodata
+          );
+        } else {
+          paparData = paparData.concat(
+            this.paparData[1].zjudata,
+            this.paparData[1].chinadata,
+            this.paparData[1].autodata
+          );
+        }
       }
       if (paparData.length) {
         let paparIds = paparData.map(it => {
@@ -541,12 +558,21 @@ export default {
           };
         }
       }
+
       if (this.collData[1]) {
-        collData = collData.concat(
-          this.collData[1].zjudata,
-          this.collData[1].chinadata,
-          this.collData[1].autodata
-        );
+        if (this.collData[1].zjudata.length) {
+          collData = collData.concat(
+            this.collData[1].chinadata,
+            this.collData[1].autodata
+          );
+        } else {
+          collData = collData.concat(
+            this.collData[1].zjudata,
+            this.collData[1].chinadata,
+            this.collData[1].autodata
+          );
+        }
+
         if (collData.length) {
           let collIds = collData.map(it => {
             return {
@@ -854,14 +880,13 @@ export default {
         coll.slice(0, 30 * this.pages[2].coll),
         collMore
       );
-      this.lines2 = []
+      this.lines2 = [];
       // setTimeout(() => {
 
       //  this.accLines2()
 
       //    this.searchShow = true;
       // }, 1000);
-
     },
     accIds(data) {
       data.forEach(it => {
