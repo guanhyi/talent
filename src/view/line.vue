@@ -54,6 +54,7 @@
         ></tableTem>
         <tableTem
           :lines="lines2"
+          :lines2="lines1"
           :loading="loading3"
           index="3"
           :tableData="tableData3"
@@ -67,30 +68,29 @@
   </div>
 </template>
 
-<script src="https://magi.com/assets/thirdparty/leader-line.min.js"></script>
 <script>
-import $ from "jquery";
-import tableTem from "@/components/common/tableTem";
-import figureChart from "@/components/Charts/figureChart";
+import $ from 'jquery'
+import tableTem from '@/components/common/tableTem'
+import figureChart from '@/components/Charts/figureChart'
 export default {
-  name: "line",
+  name: 'line',
   components: {
     figureChart,
     tableTem
   },
-  data() {
+  data () {
     return {
       loading: false,
       loading2: false,
       loading3: false,
       tip: true,
       searchShow: false, // 是否第一次查询
-      name: this.$route.query.name || "tao,yunzhe", // 姓名
-      org: this.$route.query.Organization || "columbia univ", // 机构
-      showPath: "", // 路径
+      name: this.$route.query.name || 'tao,yunzhe', // 姓名
+      org: this.$route.query.Organization || 'columbia univ', // 机构
+      showPath: '', // 路径
       checked: false, // 模糊匹配
-      p1: "",
-      id: "",
+      p1: '',
+      id: '',
       ids: [],
       paparData: [],
       collData: [],
@@ -110,224 +110,224 @@ export default {
       DomId2: [],
       lines1: [],
       lines2: []
-    };
+    }
   },
   methods: {
     // 搜索
-    search() {
+    search () {
       if (!this.name) {
-        this.$message("请输入查询姓名");
-        return;
+        this.$message('请输入查询姓名')
+        return
       }
       if (!this.org) {
-        this.$message("请输入查询机构");
-        return;
+        this.$message('请输入查询机构')
+        return
       }
-      this.clear();
-      this.showPath = this.name + "(" + this.org + ")";
+      this.clear()
+      this.showPath = this.name + '(' + this.org + ')'
       let data = this.getData({
         type: 3,
         s_name: this.name,
         s_org: this.org
-      });
+      })
       if (!data.data.length) {
-        this.$message("未能搜索到结果！");
-        this.loading = false;
-        return;
+        this.$message('未能搜索到结果！')
+        this.loading = false
+        return
       }
       this.p1 =
-        "#" + data.data[0].rid.cluster + ":" + data.data[0].rid.position;
-      this.id = data.data[0].oData.Id;
+        '#' + data.data[0].rid.cluster + ':' + data.data[0].rid.position
+      this.id = data.data[0].oData.Id
       setTimeout(() => {
-        this.getTableData1();
-      }, 1000);
+        this.getTableData1()
+      }, 1000)
     },
     // 获取数据
-    getData(data) {
-      let temp;
+    getData (data) {
+      let temp
       $.ajax({
-        type: "post",
-        url: "http://183.136.237.195/graph_db",
+        type: 'post',
+        url: 'http://183.136.237.195/graph_db',
         data: data,
-        dataType: "json",
+        dataType: 'json',
         async: false,
-        success: function(res) {
-          temp = res;
+        success: function (res) {
+          temp = res
         }
-      });
+      })
 
-      return temp;
+      return temp
     },
-    remoteMethodName(queryString, cb) {
+    remoteMethodName (queryString, cb) {
       if (queryString.length < 3) {
-        return;
+        return
       }
-      this.loading = true;
-      let that = this;
+      this.loading = true
+      let that = this
       $.ajax({
-        type: "post",
-        url: "http://183.136.237.195/graph_namematch",
+        type: 'post',
+        url: 'http://183.136.237.195/graph_namematch',
         data: {
           type: 1,
           name: queryString
         },
-        dataType: "json",
+        dataType: 'json',
         async: false,
-        success: function(res) {
+        success: function (res) {
           that.optionsName = res.data.map(it => {
             return {
               id: it.id,
               name: it.name,
               org: it.organization,
-              value: it.name + " (" + it.organization + ")"
-            };
-          });
-          cb(that.optionsName);
-          that.loading = false;
+              value: it.name + ' (' + it.organization + ')'
+            }
+          })
+          cb(that.optionsName)
+          that.loading = false
         }
-      });
+      })
     },
-    remoteMethodOrg(data, cb) {
+    remoteMethodOrg (data, cb) {
       if (data.length < 3) {
-        this.optionsName = [];
-        return;
+        this.optionsName = []
+        return
       }
-      this.loading = true;
-      let that = this;
+      this.loading = true
+      let that = this
       $.ajax({
-        type: "post",
-        url: "http://183.136.237.195/graph_namematch",
+        type: 'post',
+        url: 'http://183.136.237.195/graph_namematch',
         data: {
           type: 2,
           name: this.name,
           org: data
         },
-        dataType: "json",
+        dataType: 'json',
         async: false,
-        success: function(res) {
+        success: function (res) {
           that.optionsOrg = res.data.map(it => {
             return {
               id: it.id,
               name: it.name,
               org: it.organization,
               value: it.organization
-            };
-          });
-          cb(that.optionsOrg);
-          that.loading = false;
+            }
+          })
+          cb(that.optionsOrg)
+          that.loading = false
         }
-      });
+      })
     },
-    changeName(query) {
-      this.name = query.name;
-      this.org = query.org;
+    changeName (query) {
+      this.name = query.name
+      this.org = query.org
     },
-    changeOrg(query) {
-      this.org = query.org;
+    changeOrg (query) {
+      this.org = query.org
     },
-    getTableData1() {
-      let papar = [];
-      let coll = [];
-      let field = [];
-      let paparTitle = [];
-      let collTitle = [];
-      let fieldTitle = [];
-      let paparMore = [];
-      let collMore = [];
-      let fieldMore = [];
+    getTableData1 () {
+      let papar = []
+      let coll = []
+      let field = []
+      let paparTitle = []
+      let collTitle = []
+      let fieldTitle = []
+      let paparMore = []
+      let collMore = []
+      let fieldMore = []
       this.paparData[0] = this.getData({
         type: 15,
         ids: [{ id: this.id, link: this.name }],
         l: 1,
         p0: this.id
-      });
+      })
       papar = papar.concat(
         this.paparData[0].zjudata,
         this.paparData[0].chinadata,
         this.paparData[0].autodata
-      );
+      )
       if (papar.length) {
-        this.accIds(papar);
+        this.accIds(papar)
         paparTitle = {
-          title: "论文合作者",
+          title: '论文合作者',
           isPath: true,
-          linkinfo: "论文合作者"
-        };
+          linkinfo: '论文合作者'
+        }
         if (papar.length > 9999) {
           paparMore = {
             more: true,
-            type: "papar"
-          };
+            type: 'papar'
+          }
         }
-        this.pages[0].papar = 999;
+        this.pages[0].papar = 999
       }
       this.collData[0] = this.getData({
         type: 6,
         p1: this.p1,
         notin: this.ids
-      });
+      })
       if (this.collData[0].data.length) {
-        let zjudata = [];
-        let chinadata = [];
-        let autodata = [];
+        let zjudata = []
+        let chinadata = []
+        let autodata = []
         collTitle = {
-          title: "同事",
+          title: '同事',
           isPath: true,
-          linkinfo: "同事"
-        };
+          linkinfo: '同事'
+        }
         this.collData[0].data.forEach((item, index) => {
-          if (item.texttype === "zju") {
-            zjudata.push(item);
-          } else if (item.texttype === "auto") {
-            autodata.push(item);
-          } else if (item.texttype === "chinese") {
-            chinadata.push(item);
+          if (item.texttype === 'zju') {
+            zjudata.push(item)
+          } else if (item.texttype === 'auto') {
+            autodata.push(item)
+          } else if (item.texttype === 'chinese') {
+            chinadata.push(item)
           }
-        });
-        coll = coll.concat(zjudata, chinadata, autodata);
-        this.accIds(coll);
+        })
+        coll = coll.concat(zjudata, chinadata, autodata)
+        this.accIds(coll)
         if (coll.length > 9999) {
           collMore = {
             more: true,
-            type: "coll"
-          };
+            type: 'coll'
+          }
         }
-        this.pages[0].coll = 999;
+        this.pages[0].coll = 999
       }
-      let fieldIds = this.ids;
-      fieldIds.push({ id: this.id });
+      let fieldIds = this.ids
+      fieldIds.push({ id: this.id })
       this.fieldData[0] = this.getData({
         type: 7,
         p1: this.p1,
         notin: fieldIds
-      });
+      })
       if (this.fieldData[0].data.length) {
-        let zjudata = [];
-        let chinadata = [];
-        let autodata = [];
+        let zjudata = []
+        let chinadata = []
+        let autodata = []
         fieldTitle = {
-          title: "同领域中国学者",
+          title: '同领域中国学者',
           isPath: true,
-          linkinfo: "同领域中国学者"
-        };
+          linkinfo: '同领域中国学者'
+        }
         this.fieldData[0].data.forEach((item, index) => {
-          if (item.texttype === "zju") {
-            zjudata.push(item);
-          } else if (item.texttype === "auto") {
-            autodata.push(item);
-          } else if (item.texttype === "chinese") {
-            chinadata.push(item);
+          if (item.texttype === 'zju') {
+            zjudata.push(item)
+          } else if (item.texttype === 'auto') {
+            autodata.push(item)
+          } else if (item.texttype === 'chinese') {
+            chinadata.push(item)
           }
-        });
-        field = field.concat(zjudata, chinadata, autodata);
-        this.accIds(field);
+        })
+        field = field.concat(zjudata, chinadata, autodata)
+        this.accIds(field)
         if (field.length > 9999) {
           fieldMore = {
             more: true,
-            type: "field"
-          };
+            type: 'field'
+          }
         }
-        this.pages[0].field = 999;
+        this.pages[0].field = 999
       }
       this.tableData1 = this.tableData1.concat(
         paparTitle,
@@ -339,65 +339,67 @@ export default {
         fieldTitle,
         field.slice(0, 9999),
         fieldMore
-      );
-      this.loading = false;
+      )
+      this.loading = false
       if (this.tableData1.length) {
-        this.loading2 = true;
-        this.loading3 = true;
+        this.loading2 = true
+        this.loading3 = true
         setTimeout(() => {
-          this.getTableData2();
-        }, 500);
+          this.getTableData2()
+        }, 500)
       }
     },
-    getTableData2() {
-      let paparData = [];
-      let papar = [];
-      let field = [];
-      let coll = [];
-      let paparMore = [];
-      let collMore = [];
-      let fieldMore = [];
-      let paparTitle = [];
-      let collTitle = [];
-      let fieldTitle = [];
+    getTableData2 () {
+      let paparData = []
+      let papar = []
+      let field = []
+      let coll = []
+      let paparMore = []
+      let collMore = []
+      let fieldMore = []
+      let paparTitle = []
+      let collTitle = []
+      let fieldTitle = []
+
       paparData = paparData.concat(
         this.paparData[0].zjudata,
         this.paparData[0].chinadata,
         this.paparData[0].autodata
-      );
-      if (paparData.length) {
+      )
+
+      if (paparData.length && !this.paparData[0].zjudata.length) {
         let paparIds = paparData.map(it => {
           return {
             id: it.oData.Id,
             link: it.linkinfo
-          };
-        });
+          }
+        })
         this.paparData[1] = this.getData({
           type: 15,
           notin: this.ids,
           ids: paparIds,
           l: 2,
           p0: this.id
-        });
+        })
 
         papar = papar.concat(
           this.paparData[1].zjudata,
           this.paparData[1].chinadata,
           this.paparData[1].autodata
-        );
+        )
         if (papar.length) {
           paparTitle = {
-            title: "论文合作者的论文合作者",
+            title: '论文合作者的论文合作者',
             isPath: true,
-            linkinfo: "论文合作者的论文合作者"
-          };
+            linkinfo: '论文合作者的论文合作者'
+          }
         }
-        this.pages[1].papar = 999;
+        this.pages[1].papar = 999
         if (papar.length > 9999) {
           paparMore = {
             more: true,
-            type: "papar"
-          };
+            type: 'papar'
+          }
         }
       }
       // if (this.fieldData[0].data.length) {
@@ -435,112 +437,118 @@ export default {
       //     };
       //   }
       // }
-
-      if (this.collData[0].data.length) {
+      let zjudata = []
+      this.collData[0].data.forEach(it => {
+        if (it.texttype === 'zju') {
+          zjudata.push({
+            id: it.oData.Id,
+            link: this.name + '-----' + it.oData.Name
+          })
+        }
+      })
+      if (this.collData[0].data.length && !zjudata.length) {
         let collIds = this.collData[0].data.map(it => {
           return {
             id: it.oData.Id,
-            link: this.name + "-----" + it.oData.Name
-          };
-        });
+            link: this.name + '-----' + it.oData.Name
+          }
+        })
         this.collData[1] = this.getData({
           type: 15,
           ids: collIds,
           notin: this.ids,
           l: 2,
           p0: this.id
-        });
+        })
         coll = coll.concat(
           this.collData[1].zjudata,
           // this.collData[1].chinadata,
           this.collData[1].autodata
-        );
+        )
         if (coll.length) {
           collTitle = {
-            title: "同事的论文合作者",
+            title: '同事的论文合作者',
             isPath: true,
-            linkinfo: "同事的论文合作者"
-          };
+            linkinfo: '同事的论文合作者'
+          }
         }
-        this.pages[1].coll = 999;
+        this.pages[1].coll = 999
         if (coll.length > 9999) {
           collMore = {
             more: true,
-            type: "coll"
-          };
+            type: 'coll'
+          }
         }
       }
-      this.accIds(papar);
-      this.accIds(coll);
-      this.accIds(field);
+      this.accIds(papar)
+      this.accIds(coll)
+
       this.tableData2 = this.tableData2.concat(
         paparTitle,
         papar.slice(0, 9999),
         paparMore,
         collTitle,
         coll.slice(0, 9999),
-        collMore,
-        fieldTitle,
-        field.slice(0, 9999),
-        fieldMore
-      );
-      this.loading2 = false;
+        collMore
+
+      )
+      this.loading2 = false
       if (this.tableData2.length) {
-        this.accLines();
-        this.getTableData3();
+        this.accLines()
+        this.getTableData3()
       } else {
-        this.loading3 = false;
+        this.loading3 = false
       }
     },
-    getTableData3() {
-      this.loading3 = true;
-      let paparData = [];
-      let collData = [];
-      let papar = [];
-      let coll = [];
-      let paparMore = [];
-      let collMore = [];
-      let paparTitle = [];
-      let collTitle = [];
+    getTableData3 () {
+      this.loading3 = true
+      let paparData = []
+      let collData = []
+      let papar = []
+      let coll = []
+      let paparMore = []
+      let collMore = []
+      let paparTitle = []
+      let collTitle = []
       if (this.paparData[1]) {
         paparData = paparData.concat(
           this.paparData[1].zjudata,
           this.paparData[1].chinadata,
           this.paparData[1].autodata
-        );
+        )
       }
-      if (paparData.length) {
+      if (paparData.length && !this.paparData[1].zjudata.length) {
         let paparIds = paparData.map(it => {
           return {
             id: it.oData.Id,
             link: it.linkinfo
-          };
-        });
+          }
+        })
         this.paparData[2] = this.getData({
           type: 15,
           ids: paparIds,
           l: 3,
           notin: this.ids,
           p0: this.id
-        });
+        })
         papar = papar.concat(
           this.paparData[2].zjudata,
           this.paparData[2].chinadata,
           this.paparData[2].autodata
-        );
-        this.pages[2].papar = 999;
+        )
+        this.pages[2].papar = 999
         if (papar.length) {
           paparTitle = {
-            title: "论文合作者的论文合作者的论文合作者",
+            title: '论文合作者的论文合作者的论文合作者',
             isPath: true,
-            linkinfo: "论文合作者的论文合作者的论文合作者"
-          };
+            linkinfo: '论文合作者的论文合作者的论文合作者'
+          }
         }
         if (papar.length > 9999) {
           paparMore = {
             more: true,
-            type: "papar"
-          };
+            type: 'papar'
+          }
         }
       }
       if (this.collData[1]) {
@@ -548,39 +556,39 @@ export default {
           this.collData[1].zjudata,
           this.collData[1].chinadata,
           this.collData[1].autodata
-        );
-        if (collData.length) {
+        )
+        if (collData.length && !this.collData[1].zjudata.length) {
           let collIds = collData.map(it => {
             return {
               id: it.oData.Id,
               link: it.linkinfo
-            };
-          });
+            }
+          })
           this.collData[2] = this.getData({
             type: 15,
             notin: this.ids,
             ids: collIds,
             l: 3,
             p0: this.id
-          });
+          })
           coll = coll.concat(
             this.collData[2].zjudata,
             this.collData[2].chinadata,
             this.collData[2].autodata
-          );
+          )
         }
-        this.pages[2].coll = 999;
+        this.pages[2].coll = 999
         if (coll.length) {
           collTitle = {
-            title: "同事的论文合作者的论文合作者",
+            title: '同事的论文合作者的论文合作者',
             isPath: true,
-            linkinfo: "同事的论文合作者的论文合作者"
-          };
+            linkinfo: '同事的论文合作者的论文合作者'
+          }
           if (coll.length > 9999) {
             collMore = {
               more: true,
-              type: "coll"
-            };
+              type: 'coll'
+            }
           }
         }
       }
@@ -591,109 +599,109 @@ export default {
         collTitle,
         coll.slice(0, 9999),
         collMore
-      );
+      )
       if (this.tableData3.length) {
-        this.accLines2();
+        this.accLines2()
       }
-      this.loading3 = false;
+      this.loading3 = false
     },
-    moreData(data) {
-      if (data.type === "papar") {
-        this.pages[parseInt(data.index) - 1].papar++;
-      } else if (data.type === "coll") {
-        this.pages[parseInt(data.index) - 1].coll++;
-      } else if (data.type === "field") {
-        this.pages[parseInt(data.index) - 1].field++;
+    moreData (data) {
+      if (data.type === 'papar') {
+        this.pages[parseInt(data.index) - 1].papar++
+      } else if (data.type === 'coll') {
+        this.pages[parseInt(data.index) - 1].coll++
+      } else if (data.type === 'field') {
+        this.pages[parseInt(data.index) - 1].field++
       }
-      if (data.index === "1") {
-        this.addTableData1(data);
-      } else if (data.index === "2") {
-        this.addTableData2(data);
-      } else if (data.index === "3") {
-        this.addTableData3(data);
+      if (data.index === '1') {
+        this.addTableData1(data)
+      } else if (data.index === '2') {
+        this.addTableData2(data)
+      } else if (data.index === '3') {
+        this.addTableData3(data)
       }
     },
-    addTableData1() {
-      let papar = [];
-      let paparMore = [];
-      let paparTitle = [];
-      let coll = [];
-      let collTitle = [];
-      let collMore = [];
-      let field = [];
-      let fieldMore = [];
-      let fieldTitle = [];
+    addTableData1 () {
+      let papar = []
+      let paparMore = []
+      let paparTitle = []
+      let coll = []
+      let collTitle = []
+      let collMore = []
+      let field = []
+      let fieldMore = []
+      let fieldTitle = []
       if (this.paparData[0]) {
         papar = papar.concat(
           this.paparData[0].zjudata,
           this.paparData[0].chinadata,
           this.paparData[0].autodata
-        );
+        )
         if (papar.length > 30 * this.pages[0].papar) {
           paparMore = {
             more: true,
-            type: "papar"
-          };
+            type: 'papar'
+          }
         }
         paparTitle = {
-          title: "论文合作者",
+          title: '论文合作者',
           isPath: true,
-          linkinfo: "论文合作者"
-        };
+          linkinfo: '论文合作者'
+        }
       }
       if (this.collData[0]) {
-        let zjudata = [];
-        let chinadata = [];
-        let autodata = [];
+        let zjudata = []
+        let chinadata = []
+        let autodata = []
         this.collData[0].data.forEach((item, index) => {
-          if (item.texttype === "zju") {
-            zjudata.push(item);
-          } else if (item.texttype === "auto") {
-            autodata.push(item);
-          } else if (item.texttype === "chinese") {
-            chinadata.push(item);
+          if (item.texttype === 'zju') {
+            zjudata.push(item)
+          } else if (item.texttype === 'auto') {
+            autodata.push(item)
+          } else if (item.texttype === 'chinese') {
+            chinadata.push(item)
           }
-        });
-        coll = coll.concat(zjudata, chinadata, autodata);
+        })
+        coll = coll.concat(zjudata, chinadata, autodata)
         if (coll.length > 30 * this.pages[0].coll) {
           collMore = {
             more: true,
-            type: "coll"
-          };
+            type: 'coll'
+          }
         }
         collTitle = {
-          title: "同事",
+          title: '同事',
           isPath: true,
-          linkinfo: "同事"
-        };
+          linkinfo: '同事'
+        }
       }
       if (this.fieldData[0]) {
-        let zjudata = [];
-        let chinadata = [];
-        let autodata = [];
+        let zjudata = []
+        let chinadata = []
+        let autodata = []
         this.fieldData[0].data.forEach((item, index) => {
-          if (item.texttype === "zju") {
-            zjudata.push(item);
-          } else if (item.texttype === "auto") {
-            autodata.push(item);
-          } else if (item.texttype === "chinese") {
-            chinadata.push(item);
+          if (item.texttype === 'zju') {
+            zjudata.push(item)
+          } else if (item.texttype === 'auto') {
+            autodata.push(item)
+          } else if (item.texttype === 'chinese') {
+            chinadata.push(item)
           }
-        });
-        field = field.concat(zjudata, chinadata, autodata);
+        })
+        field = field.concat(zjudata, chinadata, autodata)
         if (field.length > 30 * this.pages[0].field) {
           fieldMore = {
             more: true,
-            type: "field"
-          };
+            type: 'field'
+          }
         }
         fieldTitle = {
-          title: "同领域中国学者",
+          title: '同领域中国学者',
           isPath: true,
-          linkinfo: "同领域中国学者"
-        };
+          linkinfo: '同领域中国学者'
+        }
       }
-      this.tableData1 = [];
+      this.tableData1 = []
       this.tableData1 = this.tableData1.concat(
         paparTitle,
         papar.slice(0, 30 * this.pages[0].papar),
@@ -704,37 +712,37 @@ export default {
         fieldTitle,
         field.slice(0, 30 * this.pages[0].field),
         fieldMore
-      );
+      )
     },
-    addTableData2(data) {
+    addTableData2 (data) {
       // this.tableShow2 = false;
-      let papar = [];
-      let coll = [];
-      let field = [];
-      let paparMore = [];
-      let paparTitle = [];
-      let collMore = [];
-      let collTitle = [];
-      let fieldMore = [];
-      let fieldTitle = [];
+      let papar = []
+      let coll = []
+      let field = []
+      let paparMore = []
+      let paparTitle = []
+      let collMore = []
+      let collTitle = []
+      let fieldMore = []
+      let fieldTitle = []
       if (this.paparData[1]) {
         papar = papar.concat(
           this.paparData[1].zjudata,
           this.paparData[1].chinadata,
           this.paparData[1].autodata
-        );
+        )
       }
       if (papar.length) {
         paparTitle = {
-          title: "论文合作者",
+          title: '论文合作者',
           isPath: true,
-          linkinfo: "论文合作者"
-        };
+          linkinfo: '论文合作者'
+        }
         if (papar.length > 30 * this.pages[1].papar) {
           paparMore = {
             more: true,
-            type: "papar"
-          };
+            type: 'papar'
+          }
         }
       }
 
@@ -743,21 +751,21 @@ export default {
           this.collData[1].zjudata,
           this.collData[1].chinadata,
           this.collData[1].autodata
-        );
+        )
 
         if (coll.length) {
           if (coll.length > 30 * this.pages[1].coll) {
             collMore = {
               more: true,
-              type: "coll",
+              type: 'coll',
               size: this.pages[1].coll
-            };
+            }
           }
           collTitle = {
-            title: "同事的论文合作者",
+            title: '同事的论文合作者',
             isPath: true,
-            linkinfo: "同事的论文合作者"
-          };
+            linkinfo: '同事的论文合作者'
+          }
         }
       }
 
@@ -782,7 +790,7 @@ export default {
       //     linkinfo: "同领域中国学者"
       //   };
       // }
-      this.tableData2 = [];
+      this.tableData2 = []
       this.tableData2 = this.tableData2.concat(
         paparTitle,
         papar.slice(0, 30 * this.pages[1].papar),
@@ -793,38 +801,38 @@ export default {
         fieldTitle,
         field.slice(0, 30 * this.pages[1].field),
         fieldMore
-      );
+      )
       // this.accLines();
       // setTimeout(() => {
       //   this.tableShow2 = true;
       // }, 1000);
     },
-    addTableData3() {
+    addTableData3 () {
       // this.searchShow = false;
-      let papar = [];
-      let coll = [];
-      let paparMore = [];
-      let paparTitle = [];
-      let collMore = [];
-      let collTitle = [];
+      let papar = []
+      let coll = []
+      let paparMore = []
+      let paparTitle = []
+      let collMore = []
+      let collTitle = []
       if (this.paparData[2]) {
         papar = papar.concat(
           this.paparData[2].zjudata,
           this.paparData[2].chinadata,
           this.paparData[2].autodata
-        );
+        )
         if (papar.length) {
           if (papar.length > 30 * this.pages[2].papar) {
             paparMore = {
               more: true,
-              type: "papar"
-            };
+              type: 'papar'
+            }
           }
           paparTitle = {
-            title: "论文合作者的论文合作者的论文合作者",
+            title: '论文合作者的论文合作者的论文合作者',
             isPath: true,
-            linkinfo: "论文合作者的论文合作者的论文合作者"
-          };
+            linkinfo: '论文合作者的论文合作者的论文合作者'
+          }
         }
       }
       if (this.collData[2]) {
@@ -832,22 +840,22 @@ export default {
           this.collData[2].zjudata,
           this.collData[2].chinadata,
           this.collData[2].autodata
-        );
+        )
         if (coll.length) {
           if (this.collData[0].data.length > 30 * this.pages[2].coll) {
             collMore = {
               more: true,
-              type: "coll"
-            };
+              type: 'coll'
+            }
           }
           collTitle = {
-            title: "同事的论文合作者的论文合作者",
+            title: '同事的论文合作者的论文合作者',
             isPath: true,
-            linkinfo: "同事的论文合作者的论文合作者"
-          };
+            linkinfo: '同事的论文合作者的论文合作者'
+          }
         }
       }
-      this.tableData3 = [];
+      this.tableData3 = []
       this.tableData3 = this.tableData3.concat(
         paparTitle,
         papar.slice(0, 30 * this.pages[2].papar),
@@ -855,7 +863,7 @@ export default {
         collTitle,
         coll.slice(0, 30 * this.pages[2].coll),
         collMore
-      );
+      )
       this.lines2 = []
       // setTimeout(() => {
 
@@ -863,90 +871,89 @@ export default {
 
       //    this.searchShow = true;
       // }, 1000);
-
     },
-    accIds(data) {
+    accIds (data) {
       data.forEach(it => {
-        this.ids.push({ id: it.oData.Id });
-      });
+        this.ids.push({ id: it.oData.Id })
+      })
     },
-    accLines(data) {
-      let table1 = this.tableData1;
-      let table2 = this.tableData2;
-      let index1 = 0;
-      let index2 = 0;
-      let table1Ids = [];
+    accLines (data) {
+      let table1 = this.tableData1
+      let table2 = this.tableData2
+      let index1 = 0
+      let index2 = 0
+      let table1Ids = []
       table1.forEach(it => {
         if (!it.isPath && !it.more) {
-          table1Ids.push({ id: "table1" + index1, name: it.oData.Name });
+          table1Ids.push({ id: 'table1' + index1, name: it.oData.Name })
         }
-        index1++;
-      });
+        index1++
+      })
       table2.forEach((it, index) => {
         if (!it.isPath && !it.more) {
-          let temp = it.linkinfo.split("-----");
-          let indexn = table1Ids.findIndex(item => item.name === temp[1]);
+          let temp = it.linkinfo.split('-----')
+          let indexn = table1Ids.findIndex(item => item.name === temp[1])
           this.lines1.push({
-            start: "table2" + index2,
+            start: 'table2' + index2,
             end: table1Ids[indexn].id
-          });
+          })
         }
-        index2++;
-      });
+        index2++
+      })
     },
-    accLines2(data) {
-      let table1 = this.tableData2;
-      let table2 = this.tableData3;
-      let index1 = 0;
-      let index2 = 0;
-      let table1Ids = [];
+    accLines2 (data) {
+      let table1 = this.tableData2
+      let table2 = this.tableData3
+      let index1 = 0
+      let index2 = 0
+      let table1Ids = []
       table1.forEach(it => {
         if (!it.isPath && !it.more) {
-          table1Ids.push({ id: "table2" + index1, name: it.oData.Name });
+          table1Ids.push({ id: 'table2' + index1, name: it.oData.Name })
         }
-        index1++;
-      });
+        index1++
+      })
       table2.forEach((it, index) => {
         if (!it.isPath && !it.more) {
-          let temp = it.linkinfo.split("-----");
-          let indexn = table1Ids.findIndex(item => item.name === temp[2]);
+          let temp = it.linkinfo.split('-----')
+          let indexn = table1Ids.findIndex(item => item.name === temp[2])
           this.lines2.push({
-            start: "table3" + index2,
+            start: 'table3' + index2,
             end: table1Ids[indexn].id
-          });
+          })
         }
-        index2++;
-      });
+        index2++
+      })
     },
-    clear() {
-      this.searchShow = true;
-      this.loading = true;
-      this.tableData1 = [];
-      this.tableData2 = [];
-      this.tableData3 = [];
+    clear () {
+      this.searchShow = true
+      this.loading = true
+      this.tableData1 = []
+      this.tableData2 = []
+      this.tableData3 = []
       this.ids = [];
       (this.pages = [
         { papar: 0, coll: 0, field: 0 },
         { papar: 0, coll: 0, field: 0 },
         { papar: 0, coll: 0, field: 0 }
       ]),
-        (this.DomI = 0),
-        (this.DomIIndex = 0),
-        (this.DomIIndex2 = 0),
-        (this.DomId1 = []),
-        (this.DomId2 = []),
-        (this.lines1 = []),
-        (this.lines2 = []);
+      (this.DomI = 0),
+      (this.DomIIndex = 0),
+      (this.DomIIndex2 = 0),
+      (this.DomId1 = []),
+      (this.DomId2 = []),
+      (this.lines1 = []),
+      (this.lines2 = [])
     },
-    handleClick() {}
+    handleClick () {}
   },
-  mounted() {
+  mounted () {
     if (this.$route.query.name) {
-      this.search();
+      this.search()
     }
   },
   watch: {}
-};
+}
 </script>
 
 <style lang="scss">

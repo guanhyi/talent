@@ -28,11 +28,13 @@
                   placement="top-start"
                 >
                   <span
+                    style='cursor:pointer'
                     :id='"table"+index+scope.$index'
                   >{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
                 </el-tooltip>
                 <!-- <el-button type="primary" v-else-if="scope.$index === paparSize" @click="moreData">加载更多</el-button> -->
                 <span
+                            style='cursor:pointer'
                   v-else
                   :id='"table"+index+scope.$index'
                 >{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
@@ -41,13 +43,14 @@
             <el-table-column label="机构" align="center">
               <template slot-scope="scope" v-if="!scope.row.isPath && !scope.row.more">
                 <el-tooltip
+                  style='cursor:pointer'
                   v-if="tip"
                   class="item"
                   effect="dark"
                   :content="scope.row.linkinfo"
                   placement="top-start"
                 >
-                  <span>{{scope.row.oData.Organization}}</span>
+                  <span >{{scope.row.oData.Organization}}</span>
                 </el-tooltip>
                 <span v-else>{{scope.row.oData.Organization}}</span>
               </template>
@@ -86,6 +89,9 @@ export default {
     lines: {
       type: Array
     },
+    lines2: {
+      type: Array
+    },
     drawLine: {
       type: Boolean,
       default: false
@@ -106,7 +112,8 @@ export default {
   data () {
     return {
       line1: [],
-      line2: []
+      line2: [],
+      line3: []
     }
   },
   methods: {
@@ -166,6 +173,7 @@ export default {
         hide: true
       }
       // Anchor styles
+      let that = this
       data.forEach((record, index) => {
         var anchor = LeaderLine.mouseHoverAnchor(
           document.getElementById(record.start),
@@ -190,14 +198,20 @@ export default {
               backgroundSize: null,
               backgroundPosition: null,
               backgroundRepeat: null
-            }
+            },
             // 当起始点被hover时调用的事件
-            // onSwitch: function (event) {
-            //   var line = lines[record.start]
-            //   // 浮动上去就重绘
-            //   if (event.type === 'mouseenter') {
-            //   }
-            // }
+            onSwitch: function (event) {
+              if (that.index === '3') {
+                if (event.type === 'mouseenter') {
+                  that.line3[record.start].show()
+                } else if (event.type === 'mouseleave') {
+                  that.line3[record.start].hide()
+                }
+              }
+              // var line = lines[record.start]
+
+              // 浮动上去就重绘
+            }
           }
         )
         if (this.index === '2') {
@@ -212,32 +226,23 @@ export default {
             document.getElementById(record.end),
             options
           )
+          let indexn = that.lines2.findIndex(
+            item => item.start === record.end
+          )
+          that.line3[record.start] = new LeaderLine(
+            document.getElementById(that.lines2[indexn].start),
+            document.getElementById(that.lines2[indexn].end),
+            {
+              color: '#5bf',
+              endPlug: 'disc',
+              size: 2,
+              duration: 500,
+              timing: [0.58, 0, 0.42, 1],
+              hide: true }
+          ).hide('draw', {duration: 2000, timing: [0.42, 0.6, 0.4, 1]})
         }
       })
     }
-    // clearLine () {
-    //   if (this.index === '2') {
-    //     this.line1.forEach((it, index) => {
-    //       this.line1[it].remove()
-    //     })
-    //   } else if (this.index === '3') {
-
-    //   }
-    // // },
-    // clearLine (data) {
-    //   if (this.index === '2') {
-    //     for (var key in this.line1) {
-    //       this.line1[key].remove()
-    //     }
-    //   } else if (this.index === '3') {
-    //     for (var key in this.line2) {
-    //       this.line2[key].remove()
-    //     }
-    //   }
-    //   this.line2 = []
-
-    //   console.log(this.line2)
-    // }
   },
   mounted () {}
 }

@@ -358,20 +358,14 @@ export default {
       let paparTitle = [];
       let collTitle = [];
       let fieldTitle = [];
-      if (this.paparData[0].zjudata.length) {
-        paparData = paparData.concat(
-          this.paparData[0].chinadata,
-          this.paparData[0].autodata
-        );
-      } else {
-        paparData = paparData.concat(
-          this.paparData[0].zjudata,
-          this.paparData[0].chinadata,
-          this.paparData[0].autodata
-        );
-      }
 
-      if (paparData.length) {
+      paparData = paparData.concat(
+        this.paparData[0].zjudata,
+        this.paparData[0].chinadata,
+        this.paparData[0].autodata
+      );
+
+      if (paparData.length && !this.paparData[0].zjudata.length) {
         let paparIds = paparData.map(it => {
           return {
             id: it.oData.Id,
@@ -441,15 +435,21 @@ export default {
       //     };
       //   }
       // }
-
-      if (this.collData[0].data.length) {
+      let zjudata = [];
+      this.collData[0].data.forEach(it => {
+        if (it.texttype === "zju") {
+          zjudata.push({
+            id: it.oData.Id,
+            link: this.name + "-----" + it.oData.Name
+          });
+        }
+      });
+      if (this.collData[0].data.length && !zjudata.length) {
         let collIds = this.collData[0].data.map(it => {
-          if (it.texttype !== "zju") {
-            return {
-              id: it.oData.Id,
-              link: this.name + "-----" + it.oData.Name
-            };
-          }
+          return {
+            id: it.oData.Id,
+            link: this.name + "-----" + it.oData.Name
+          };
         });
         this.collData[1] = this.getData({
           type: 15,
@@ -511,20 +511,14 @@ export default {
       let paparTitle = [];
       let collTitle = [];
       if (this.paparData[1]) {
-        if (this.paparData[1].zjudata.length) {
-          paparData = paparData.concat(
-            this.paparData[1].chinadata,
-            this.paparData[1].autodata
-          );
-        } else {
-          paparData = paparData.concat(
-            this.paparData[1].zjudata,
-            this.paparData[1].chinadata,
-            this.paparData[1].autodata
-          );
-        }
+        paparData = paparData.concat(
+          this.paparData[1].zjudata,
+          this.paparData[1].chinadata,
+          this.paparData[1].autodata
+        );
       }
-      if (paparData.length) {
+
+      if (paparData.length && !this.paparData[1].zjudata.length) {
         let paparIds = paparData.map(it => {
           return {
             id: it.oData.Id,
@@ -560,20 +554,13 @@ export default {
       }
 
       if (this.collData[1]) {
-        if (this.collData[1].zjudata.length) {
-          collData = collData.concat(
-            this.collData[1].chinadata,
-            this.collData[1].autodata
-          );
-        } else {
-          collData = collData.concat(
-            this.collData[1].zjudata,
-            this.collData[1].chinadata,
-            this.collData[1].autodata
-          );
-        }
+        collData = collData.concat(
+          this.collData[1].zjudata,
+          this.collData[1].chinadata,
+          this.collData[1].autodata
+        );
 
-        if (collData.length) {
+        if (collData.length && !this.collData[1].zjudata.length) {
           let collIds = collData.map(it => {
             return {
               id: it.oData.Id,

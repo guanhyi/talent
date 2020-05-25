@@ -9,11 +9,9 @@ import store from './store/store.js'
 import 'babel-polyfill'
 import VueAreaLinkage from 'vue-area-linkage'
 import '@/styles/index.scss' // global css
-import leaderLine from 'leader-line'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
-Vue.use(leaderLine)
 Vue.use(VueAreaLinkage)
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) { // 需要登录的页面
