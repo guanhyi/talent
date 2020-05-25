@@ -714,164 +714,6 @@ export default {
         fieldMore
       )
     },
-    addTableData2 (data) {
-      // this.tableShow2 = false;
-      let papar = []
-      let coll = []
-      let field = []
-      let paparMore = []
-      let paparTitle = []
-      let collMore = []
-      let collTitle = []
-      let fieldMore = []
-      let fieldTitle = []
-      if (this.paparData[1]) {
-        papar = papar.concat(
-          this.paparData[1].zjudata,
-          this.paparData[1].chinadata,
-          this.paparData[1].autodata
-        )
-      }
-      if (papar.length) {
-        paparTitle = {
-          title: '论文合作者',
-          isPath: true,
-          linkinfo: '论文合作者'
-        }
-        if (papar.length > 30 * this.pages[1].papar) {
-          paparMore = {
-            more: true,
-            type: 'papar'
-          }
-        }
-      }
-
-      if (this.collData[1]) {
-        coll = coll.concat(
-          this.collData[1].zjudata,
-          this.collData[1].chinadata,
-          this.collData[1].autodata
-        )
-
-        if (coll.length) {
-          if (coll.length > 30 * this.pages[1].coll) {
-            collMore = {
-              more: true,
-              type: 'coll',
-              size: this.pages[1].coll
-            }
-          }
-          collTitle = {
-            title: '同事的论文合作者',
-            isPath: true,
-            linkinfo: '同事的论文合作者'
-          }
-        }
-      }
-
-      // if (this.fieldData[1]) {
-      //   field = field.concat(
-      //     this.fieldData[1].zjudata,
-      //     this.fieldData[1].chinadata,
-      //     this.fieldData[1].autodata
-      //   );
-      // }
-
-      // if (field.length) {
-      //   if (field.length > 30 * this.pages[1].field) {
-      //     fieldMore = {
-      //       more: true,
-      //       type: "field"
-      //     };
-      //   }
-      //   fieldTitle = {
-      //     title: "同领域中国学者",
-      //     isPath: true,
-      //     linkinfo: "同领域中国学者"
-      //   };
-      // }
-      this.tableData2 = []
-      this.tableData2 = this.tableData2.concat(
-        paparTitle,
-        papar.slice(0, 30 * this.pages[1].papar),
-        paparMore,
-        collTitle,
-        coll.slice(0, 30 * this.pages[1].coll),
-        collMore,
-        fieldTitle,
-        field.slice(0, 30 * this.pages[1].field),
-        fieldMore
-      )
-      // this.accLines();
-      // setTimeout(() => {
-      //   this.tableShow2 = true;
-      // }, 1000);
-    },
-    addTableData3 () {
-      // this.searchShow = false;
-      let papar = []
-      let coll = []
-      let paparMore = []
-      let paparTitle = []
-      let collMore = []
-      let collTitle = []
-      if (this.paparData[2]) {
-        papar = papar.concat(
-          this.paparData[2].zjudata,
-          this.paparData[2].chinadata,
-          this.paparData[2].autodata
-        )
-        if (papar.length) {
-          if (papar.length > 30 * this.pages[2].papar) {
-            paparMore = {
-              more: true,
-              type: 'papar'
-            }
-          }
-          paparTitle = {
-            title: '论文合作者的论文合作者的论文合作者',
-            isPath: true,
-            linkinfo: '论文合作者的论文合作者的论文合作者'
-          }
-        }
-      }
-      if (this.collData[2]) {
-        coll = coll.concat(
-          this.collData[2].zjudata,
-          this.collData[2].chinadata,
-          this.collData[2].autodata
-        )
-        if (coll.length) {
-          if (this.collData[0].data.length > 30 * this.pages[2].coll) {
-            collMore = {
-              more: true,
-              type: 'coll'
-            }
-          }
-          collTitle = {
-            title: '同事的论文合作者的论文合作者',
-            isPath: true,
-            linkinfo: '同事的论文合作者的论文合作者'
-          }
-        }
-      }
-      this.tableData3 = []
-      this.tableData3 = this.tableData3.concat(
-        paparTitle,
-        papar.slice(0, 30 * this.pages[2].papar),
-        paparMore,
-        collTitle,
-        coll.slice(0, 30 * this.pages[2].coll),
-        collMore
-      )
-      this.lines2 = []
-      // setTimeout(() => {
-
-      //  this.accLines2()
-
-      //    this.searchShow = true;
-      // }, 1000);
-    },
     accIds (data) {
       data.forEach(it => {
         this.ids.push({ id: it.oData.Id })
@@ -931,12 +773,12 @@ export default {
       this.tableData1 = []
       this.tableData2 = []
       this.tableData3 = []
-      this.ids = [];
-      (this.pages = [
+      this.ids = []
+      this.pages = [
         { papar: 0, coll: 0, field: 0 },
         { papar: 0, coll: 0, field: 0 },
         { papar: 0, coll: 0, field: 0 }
-      ]),
+      ]
       (this.DomI = 0),
       (this.DomIIndex = 0),
       (this.DomIIndex2 = 0),

@@ -5,7 +5,6 @@
       <div class="PL_50 PR_50">
         <div class="relation-top row">
           <div>
-            <!-- <span>展示路径：{{showPath}}{{lable}}</span> -->
           </div>
         </div>
         <div class="row relation-echart" v-if="tableData.length">
@@ -32,7 +31,6 @@
                     :id='"table"+index+scope.$index'
                   >{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
                 </el-tooltip>
-                <!-- <el-button type="primary" v-else-if="scope.$index === paparSize" @click="moreData">加载更多</el-button> -->
                 <span
                             style='cursor:pointer'
                   v-else
@@ -74,9 +72,6 @@ export default {
     index: {
       type: String
     },
-    showPath: {
-      type: String
-    },
     loading: {
       type: Boolean,
       default: false
@@ -85,16 +80,11 @@ export default {
       type: Boolean,
       default: false
     },
-
     lines: {
       type: Array
     },
     lines2: {
       type: Array
-    },
-    drawLine: {
-      type: Boolean,
-      default: false
     }
   },
   watch: {
@@ -144,7 +134,6 @@ export default {
         index: this.index,
         type: row.type
       }
-      // this.clearLine()
 
       this.$emit('moreData', data)
     },
@@ -152,7 +141,6 @@ export default {
       if (!column || row.isPath) {
         return
       }
-
       let routeData = this.$router.resolve({
         name: '/',
         query: { name: row.oData.Name, Organization: row.oData.Organization }
@@ -208,9 +196,6 @@ export default {
                   that.line3[record.start].hide()
                 }
               }
-              // var line = lines[record.start]
-
-              // 浮动上去就重绘
             }
           }
         )
