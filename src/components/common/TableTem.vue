@@ -4,8 +4,7 @@
       <el-divider content-position="left">合作路径</el-divider>
       <div class="PL_50 PR_50">
         <div class="relation-top row">
-          <div>
-          </div>
+          <div></div>
         </div>
         <div class="row relation-echart" v-if="tableData.length">
           <el-table
@@ -27,12 +26,12 @@
                   placement="top-start"
                 >
                   <span
-                    style='cursor:pointer'
+                    style="cursor:pointer"
                     :id='"table"+index+scope.$index'
                   >{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
                 </el-tooltip>
                 <span
-                            style='cursor:pointer'
+                  style="cursor:pointer"
                   v-else
                   :id='"table"+index+scope.$index'
                 >{{scope.row.isPath?scope.row.title:scope.row.oData.Name}}</span>
@@ -41,14 +40,14 @@
             <el-table-column label="机构" align="center">
               <template slot-scope="scope" v-if="!scope.row.isPath && !scope.row.more">
                 <el-tooltip
-                  style='cursor:pointer'
+                  style="cursor:pointer"
                   v-if="tip"
                   class="item"
                   effect="dark"
                   :content="scope.row.linkinfo"
                   placement="top-start"
                 >
-                  <span >{{scope.row.oData.Organization}}</span>
+                  <span>{{scope.row.oData.Organization}}</span>
                 </el-tooltip>
                 <span v-else>{{scope.row.oData.Organization}}</span>
               </template>
@@ -103,7 +102,8 @@ export default {
     return {
       line1: [],
       line2: [],
-      line3: []
+      line3: [],
+      line: []
     }
   },
   methods: {
@@ -112,6 +112,8 @@ export default {
         return 'row-red'
       } else if (row.texttype === 'chinese') {
         return 'row-highlighted'
+      } else if (row.linkcount > 5) {
+        return 'row-purple'
       }
       if (row.isPath) {
         return 'row-path'
@@ -211,9 +213,7 @@ export default {
             document.getElementById(record.end),
             options
           )
-          let indexn = that.lines2.findIndex(
-            item => item.start === record.end
-          )
+          let indexn = that.lines2.findIndex(item => item.start === record.end)
           that.line3[record.start] = new LeaderLine(
             document.getElementById(that.lines2[indexn].start),
             document.getElementById(that.lines2[indexn].end),
@@ -223,11 +223,49 @@ export default {
               size: 2,
               duration: 500,
               timing: [0.58, 0, 0.42, 1],
-              hide: true }
-          ).hide('draw', {duration: 2000, timing: [0.42, 0.6, 0.4, 1]})
+              hide: true
+            }
+          ).hide('draw', { duration: 2000, timing: [0.42, 0.6, 0.4, 1] })
         }
       })
     }
+    // hover (row, column, cell, event) {
+    //   if (!column || row.isPath || !this.lines) {
+    //     return
+    //   }
+    //   if (this.lines2) {
+
+    //   } else {
+    //     if (this.line[row.oData.Id]) {
+    //       console.log(this.line[row.oData.Id].show())
+    //       console.log(this.line[row.oData.Id].position())
+
+    //       this.line[row.oData.Id].show()
+    //       this.line[row.oData.Id].position()
+    //       return
+    //     }
+    //     let indexn = this.lines.findIndex(item => item.start === row.oData.Id)
+    //     this.line[row.oData.Id] = new LeaderLine(
+    //       document.getElementById(this.lines[indexn].start),
+    //       document.getElementById(this.lines[indexn].end),
+    //       {
+    //         color: '#5bf',
+    //         endPlug: 'disc',
+    //         size: 2,
+    //         duration: 500,
+    //         timing: [0.58, 0, 0.42, 1],
+    //         hide: true
+    //       }
+    //     ).hide('draw', { duration: 2000, timing: [0.42, 0.6, 0.4, 1] })
+    //     this.line[row.oData.Id].show()
+    //   }
+    // },
+    // leave (row, column, cell, event) {
+    //   if (!column || row.isPath || !this.lines) {
+    //     return
+    //   }
+    //   this.line[row.oData.Id].hide()
+    // }
   },
   mounted () {}
 }
@@ -279,6 +317,9 @@ export default {
     .row-path:hover > td {
       background: #cd00cd !important;
       color: white !important;
+    }
+    .row-purple {
+      color: #cd00cd;
     }
     .el-button {
       width: 90%;

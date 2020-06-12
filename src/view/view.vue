@@ -471,7 +471,7 @@ export default {
 <style lang="scss">
 .home {
   .home-header {
-    width: 1100px;
+    width: 1300px;
     border-left: 1px solid #dcdfe6;
     border-right: 1px solid #dcdfe6;
     border-bottom: 1px solid #dcdfe6;
